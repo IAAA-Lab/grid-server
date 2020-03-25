@@ -32,7 +32,7 @@ def test_query_by_boundary():
     bds.add(Boundary(boundary_ID=BoundaryID('R1R2')), Data('', ''))
     store.insert(bds)
 
-    store.query__by_boundary(Boundary(boundary_ID=BoundaryID('P12P34O23S56')))
+    store.query_by_boundary(Boundary(boundary_ID=BoundaryID('P12P34O23S56')))
 
     store.dropAll()
 
@@ -49,15 +49,15 @@ def test_query_by_polygon():
 
     b = Boundary(boundary_ID=BoundaryID('O0O1O2'))
     polygon = b.get_bbox()
-    store.query__by_polygon(polygon)
+    store.query_by_polygon(polygon)
 
     b = Boundary(boundary_ID=BoundaryID('P10P11P2'))
     polygon = b.get_bbox()
-    store.query__by_polygon(polygon)
+    store.query_by_polygon(polygon)
 
     b = Boundary(boundary_ID=BoundaryID('O'))
     polygon = b.get_bbox()
-    store.query__by_polygon(polygon)
+    store.query_by_polygon(polygon)
 
     store.dropAll()
 
@@ -74,9 +74,9 @@ def test_delete():
     bds.add(Boundary(boundary_ID=BoundaryID('R1R2')), Data('', ''))
     store.insert(bds)
 
-    store.query__by_boundary(Boundary(boundary_ID=BoundaryID('P12P34O23S56')))
-    store.delete(BoundaryID('P12P34O23S56'))
-    store.query__by_boundary(Boundary(boundary_ID=BoundaryID('P12P34O23S56')))
+    store.query_by_boundary(Boundary(boundary_ID=BoundaryID('P12P34O23S56')))
+    store.delete(Boundary(boundary_ID=BoundaryID('P12P34O23S56')))
+    store.query_by_boundary(Boundary(boundary_ID=BoundaryID('P12P34O23S56')))
 
     store.dropAll()
 
