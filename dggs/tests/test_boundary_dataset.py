@@ -1,14 +1,14 @@
-from boundary import OptimalBoundary
-from boundary_dataset import BoundaryDataSet
-from cell_ID import CellID
-from data import Data
+from dggs.boundary import OptimalBoundary
+from dggs.boundary_dataset import BoundaryDataSet
+from dggs.cell_ID import CellID
+from dggs.data import Data
 
 
 def test_boundary_dataset():
     boundary1 = OptimalBoundary(cells=[CellID('N'), CellID('O0'), CellID('P123'), CellID('S34567')])
     boundary2 = OptimalBoundary(cells=[CellID('O35'), CellID('P234')])
     boundary3 = OptimalBoundary(cells=[CellID('S034'), CellID('S57')])
-    data = Data('', '')
+    data = Data('')
 
     b_ds = {
         boundary1.boundary_ID.value: (boundary1, data),
@@ -23,7 +23,7 @@ def test_boundary_dataset_add():
     boundary1 = OptimalBoundary(cells=[CellID('N'), CellID('O0'), CellID('P123'), CellID('S34567')])
     boundary2 = OptimalBoundary(cells=[CellID('O35'), CellID('P234')])
     boundary3 = OptimalBoundary(cells=[CellID('S034'), CellID('S57')])
-    data = Data('', '')
+    data = Data('')
 
     b_ds = {
         boundary1.boundary_ID.value: (boundary1, data),
@@ -44,8 +44,8 @@ def test_boundary_dataset_get_boundary_data():
     boundary1 = OptimalBoundary(cells=[CellID('N'), CellID('O0'), CellID('P123'), CellID('S34567')])
     boundary2 = OptimalBoundary(cells=[CellID('O35'), CellID('P234')])
     boundary3 = OptimalBoundary(cells=[CellID('S034'), CellID('S57')])
-    data = Data('t', 'data')
-    data2 = Data('t', 'data2')
+    data = Data('data')
+    data2 = Data('data2')
 
     b_ds = {
         boundary1.boundary_ID.value: (boundary1, data),
@@ -61,8 +61,8 @@ def test_boundary_dataset_get_boundary_data_list():
     boundary1 = OptimalBoundary(cells=[CellID('N'), CellID('O0'), CellID('P123'), CellID('S34567')])
     boundary2 = OptimalBoundary(cells=[CellID('O35'), CellID('P234')])
     boundary3 = OptimalBoundary(cells=[CellID('S034'), CellID('S57')])
-    data = Data('t', 'data')
-    data2 = Data('t', 'data2')
+    data = Data('data')
+    data2 = Data('data2')
 
     b_ds = {
         boundary1.boundary_ID.value: (boundary1, data),

@@ -1,7 +1,7 @@
-from dggs_auids.dggs_auids import cuids_to_bp_auid, bp_auid_to_cuids
-from boundary_ID import BoundaryID, AUID
-from cell_ID import CellID
-from rHealPix import rHEALPix
+from dggs.dggs_auids.dggs_auids import cuids_to_bp_auid, bp_auid_to_cuids
+from dggs.boundary_ID import BoundaryID, AUID
+from dggs.cell_ID import CellID
+from dggs.rHealPix import rHEALPix
 import networkx as nx
 
 

@@ -1,3 +1,7 @@
+from dggs.boundary import OptimalBoundary
+from dggs.boundary_ID import BoundaryID
+from dggs.data import Data
+
 
 class BoundaryDataSet:
 
@@ -25,6 +29,15 @@ class BoundaryDataSet:
         else:
             optimal_boundary = boundary.optimize()
             self.boundary_data_set[optimal_boundary.boundary_ID.value] = (optimal_boundary, data)
+
+    def get_all(self):
+        """
+        :return: list of tuples (Boundary, Data) with all the boundaries and data of the set
+        """
+        list = []
+        for boundary_ID, value in self.boundary_data_set.items():
+            list.append(value)
+        return list
 
     def get_boundary_data(self, boundary_ID):
         """

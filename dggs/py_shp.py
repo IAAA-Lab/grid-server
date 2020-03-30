@@ -1,6 +1,6 @@
 import fiona
-from boundary import Boundary, OptimalBoundary
-from rHealPix import rHEALPix
+from dggs.boundary import Boundary, OptimalBoundary
+from dggs.rHealPix import rHEALPix
 
 
 class PyShp:

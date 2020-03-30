@@ -1,11 +1,11 @@
 import pymongo
 from bson import ObjectId
 
-from boundary import Boundary, OptimalBoundary
-from boundary_ID import BoundaryID, AUID
-from boundary_dataset import BoundaryDataSet
-from data import Data
-from rHealPix import rHEALPix
+from dggs.boundary import Boundary, OptimalBoundary
+from dggs.boundary_ID import BoundaryID, AUID
+from dggs.boundary_dataset import BoundaryDataSet
+from dggs.data import Data
+from dggs.rHealPix import rHEALPix
 
 
 class BoundaryStore:
@@ -27,7 +27,6 @@ class BoundaryStore:
 
         :param b_dataset: BoundaryDataSet containing the OptimalBoundary and Data pairs.
         """
-        boundary_data_set = b_dataset.boundary_data_set
 
         # Store boundaryDataSet
         boundary_dataset_id = ObjectId()
@@ -37,9 +36,9 @@ class BoundaryStore:
         self.db.b_data_sets.insert_one(_boundaryDataSet)
 
         # Store boundaries
-        for boundary_ID, (boundary, data) in boundary_data_set.items():
+        for (boundary, data) in b_dataset.get_all():
             _boundary = {
-                "auid": boundary_ID,
+                "auid": boundary.boundary_ID.value,
                 "bbox": {
                     "type": "Polygon",
                     "coordinates": boundary.get_bbox(),
@@ -67,7 +66,7 @@ class BoundaryStore:
     def query_by_polygon(self, polygon):
         """
         :param polygon: Polygon with which you want to make the intersection
-        :return: List of boundaries that intersect the polygon
+        :return: List of stored boundaries that intersect the polygon
         """
         boundaries_founded = self.db.boundaries.find(
             {
@@ -87,7 +86,7 @@ class BoundaryStore:
         )
         return boundaries_founded
 
-    def query_boundary_datasets(self, boundary):
+    def query_by_boundary_to_boundary_datasets(self, boundary):
         """
         :param boundary: Boundary or OptimalBoundary. If it is not optimal, it is optimized before making the query.
         :return: List of BoundaryDataSets where boundary is located
@@ -102,10 +101,24 @@ class BoundaryStore:
         boundary_data_sets = []
         for boundary in boundaries_founded:
             bds = BoundaryDataSet()
-            boundaries_in_bds_founded = self.db.boundaries.find({"boundary_dataset_id": boundary["boundary_dataset_id"]})
+            boundaries_in_bds_founded = self.db.boundaries.find(
+                {"boundary_dataset_id": boundary["boundary_dataset_id"]})
             for boundary_2 in boundaries_in_bds_founded:
-                bds.add(OptimalBoundary(boundary_ID=AUID(boundary_2["auid"])), Data(boundary_2["data"]["contentType"],
-                                                                                  boundary_2["data"]["contentData"]))
+                bds.add(OptimalBoundary(boundary_ID=AUID(boundary_2["auid"])), Data(boundary_2["data"]))
+            boundary_data_sets.append(bds)
+        return boundary_data_sets
+
+    def all_boundary_datasets(self):
+        """
+        :return: List of all stored BoudnariesDatasets
+        """
+        boundary_data_sets = []
+        boundaries_datasets_founded = self.db.b_data_sets.find()
+        for boundary_dataset in boundaries_datasets_founded:
+            bds = BoundaryDataSet()
+            boundaries_in_bds_founded = self.db.boundaries.find({"boundary_dataset_id": boundary_dataset["_id"]})
+            for boundary in boundaries_in_bds_founded:
+                bds.add(OptimalBoundary(boundary_ID=AUID(boundary["auid"])), Data(boundary["data"]))
             boundary_data_sets.append(bds)
         return boundary_data_sets
 
@@ -120,7 +133,6 @@ class BoundaryStore:
             optimal_boundary = boundary.optimize()
 
         self.db.boundaries.delete_many({"auid": optimal_boundary.boundary_ID.value})
-
 
     def dropAll(self):
         """

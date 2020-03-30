@@ -1,7 +1,7 @@
 from numpy import pi, base_repr
 from itertools import product
 from pyproj import Proj
-from cell_ID import CellID
+from dggs.cell_ID import CellID
 import decimal
 import math
 from shapely.geometry.polygon import Polygon

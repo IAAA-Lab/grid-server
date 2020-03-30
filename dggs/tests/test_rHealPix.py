@@ -1,5 +1,5 @@
-from cell_ID import CellID
-from rHealPix import rHEALPix
+from dggs.cell_ID import CellID
+from dggs.rHealPix import rHEALPix
 from numpy import pi, array
 
 r = rHEALPix(N_side=3, north_square=0, south_square=0)
