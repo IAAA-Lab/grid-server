@@ -37,3 +37,12 @@ class BoundaryDatasetSerializer(serializers.Serializer):
         bds = BoundaryDataSet(self.validated_data['boundary_data_set'])
         store.insert(bds)
 
+class BoundaryDataSerializer(serializers.Serializer):
+    boundary = serializers.SerializerMethodField()
+    data = serializers.SerializerMethodField()
+
+    def get_boundary(self, obj):
+        return obj[0].boundary_ID.value
+
+    def get_data(self, obj):
+        return obj[1].content
