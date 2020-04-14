@@ -24,7 +24,7 @@ class BoundaryDatasetField(serializers.Field):
         bds = BoundaryDataSet()
         for item in data:
             if not re.match(r'^[A-Za-z0-9]+$', item['boundary']):
-                raise ValidationError('Incorrect format.')
+                raise ValidationError('Incorrect format: ' + item['boundary'])
 
             bds.add(Boundary(boundary_ID=BoundaryID(item['boundary'])),  Data(item['data']))
         return bds.boundary_data_set
