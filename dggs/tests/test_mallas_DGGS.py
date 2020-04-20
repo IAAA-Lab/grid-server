@@ -4,18 +4,14 @@ from pymongo import MongoClient
 from dggs.boundary import Boundary
 from dggs.boundary_ID import BoundaryID
 from dggs.boundary_store import BoundaryStore
-from dggs.rHealPix import rHEALPix
 import requests
 
 
-class ShpFile:
+class TestsMallasDGGS:
 
-    def __init__(self, file, dggs=None):
+    def __init__(self, file):
         self.file = file
         self.shapes = fiona.open(file)
-        if dggs is None:
-            dggs = rHEALPix(N_side=3, north_square=0, south_square=0)
-        self.dggs = dggs
 
     def test_API(self):
 
@@ -51,14 +47,14 @@ class ShpFile:
         assert r.status_code == 201
 
         # GET ALL BOUNDARY_DATASETS TEST
-        r = requests.get('http://127.0.0.1:8000/bdatasets/' + test_boundary_id)
+        r = requests.get('http://127.0.0.1:8000/bdatasets/')
         json_test = json.dumps([boundary_dataset_test])
         json_data = json.dumps(r.json())
         assert r.status_code == 200
         assert json_test == json_data
 
         # GET BOUNDARY IN BOUNDARY_DATASET TEST
-        r = requests.get('http://127.0.0.1:8000/bdatasets/')
+        r = requests.get('http://127.0.0.1:8000/bdatasets/' + test_boundary_id)
         json_test = json.dumps([boundary_dataset_test])
         json_data = json.dumps(r.json())
         assert r.status_code == 200
@@ -318,47 +314,47 @@ if __name__ == "__main__":
     """
     EMOCIONES
     """
-    shp = ShpFile("/Users/javiermartinez/Documents/UNIVERSIDAD/TFG/mallas_DGGS/resultados_EMOCIONES/MALLA_FINAL_08.shp")
+    shp = TestsMallasDGGS("/Users/javiermartinez/Documents/UNIVERSIDAD/TFG/mallas_DGGS/resultados_EMOCIONES/MALLA_FINAL_08.shp")
     shp.test_API()
-    shp = ShpFile("/Users/javiermartinez/Documents/UNIVERSIDAD/TFG/mallas_DGGS/resultados_EMOCIONES/MALLA_FINAL_09.shp")
+    shp = TestsMallasDGGS("/Users/javiermartinez/Documents/UNIVERSIDAD/TFG/mallas_DGGS/resultados_EMOCIONES/MALLA_FINAL_09.shp")
     shp.test_API()
-    shp = ShpFile("/Users/javiermartinez/Documents/UNIVERSIDAD/TFG/mallas_DGGS/resultados_EMOCIONES/MALLA_FINAL_10.shp")
+    shp = TestsMallasDGGS("/Users/javiermartinez/Documents/UNIVERSIDAD/TFG/mallas_DGGS/resultados_EMOCIONES/MALLA_FINAL_10.shp")
     shp.test_API()
-    shp = ShpFile("/Users/javiermartinez/Documents/UNIVERSIDAD/TFG/mallas_DGGS/resultados_EMOCIONES/MALLA_FINAL_11.shp")
+    shp = TestsMallasDGGS("/Users/javiermartinez/Documents/UNIVERSIDAD/TFG/mallas_DGGS/resultados_EMOCIONES/MALLA_FINAL_11.shp")
     shp.test_API()
 
-    shp = ShpFile("/Users/javiermartinez/Documents/UNIVERSIDAD/TFG/mallas_DGGS/resultados_EMOCIONES/MALLA_FINAL_08.shp")
+    shp = TestsMallasDGGS("/Users/javiermartinez/Documents/UNIVERSIDAD/TFG/mallas_DGGS/resultados_EMOCIONES/MALLA_FINAL_08.shp")
     shp.test_API_polygon_08()
 
-    shp = ShpFile("/Users/javiermartinez/Documents/UNIVERSIDAD/TFG/mallas_DGGS/resultados_EMOCIONES/MALLA_FINAL_09.shp")
+    shp = TestsMallasDGGS("/Users/javiermartinez/Documents/UNIVERSIDAD/TFG/mallas_DGGS/resultados_EMOCIONES/MALLA_FINAL_09.shp")
     shp.test_API_polygon_09()
 
-    shp = ShpFile("/Users/javiermartinez/Documents/UNIVERSIDAD/TFG/mallas_DGGS/resultados_EMOCIONES/MALLA_FINAL_10.shp")
+    shp = TestsMallasDGGS("/Users/javiermartinez/Documents/UNIVERSIDAD/TFG/mallas_DGGS/resultados_EMOCIONES/MALLA_FINAL_10.shp")
     shp.test_API_polygon_10()
 
-    shp = ShpFile("/Users/javiermartinez/Documents/UNIVERSIDAD/TFG/mallas_DGGS/resultados_EMOCIONES/MALLA_FINAL_11.shp")
+    shp = TestsMallasDGGS("/Users/javiermartinez/Documents/UNIVERSIDAD/TFG/mallas_DGGS/resultados_EMOCIONES/MALLA_FINAL_11.shp")
     shp.test_API_polygon_11()
 
     """
     CARRIL BICI
     """
-    shp = ShpFile("/Users/javiermartinez/Documents/UNIVERSIDAD/TFG/mallas_DGGS/resultados_CARRIL_BICI/BICIS_08.shp")
+    shp = TestsMallasDGGS("/Users/javiermartinez/Documents/UNIVERSIDAD/TFG/mallas_DGGS/resultados_CARRIL_BICI/BICIS_08.shp")
     shp.test_API()
-    shp = ShpFile("/Users/javiermartinez/Documents/UNIVERSIDAD/TFG/mallas_DGGS/resultados_CARRIL_BICI/BICIS_09.shp")
+    shp = TestsMallasDGGS("/Users/javiermartinez/Documents/UNIVERSIDAD/TFG/mallas_DGGS/resultados_CARRIL_BICI/BICIS_09.shp")
     shp.test_API()
-    shp = ShpFile("/Users/javiermartinez/Documents/UNIVERSIDAD/TFG/mallas_DGGS/resultados_CARRIL_BICI/BICIS_10.shp")
+    shp = TestsMallasDGGS("/Users/javiermartinez/Documents/UNIVERSIDAD/TFG/mallas_DGGS/resultados_CARRIL_BICI/BICIS_10.shp")
     shp.test_API()
-    shp = ShpFile("/Users/javiermartinez/Documents/UNIVERSIDAD/TFG/mallas_DGGS/resultados_CARRIL_BICI/BICIS_11.shp")
+    shp = TestsMallasDGGS("/Users/javiermartinez/Documents/UNIVERSIDAD/TFG/mallas_DGGS/resultados_CARRIL_BICI/BICIS_11.shp")
     shp.test_API()
 
-    shp = ShpFile("/Users/javiermartinez/Documents/UNIVERSIDAD/TFG/mallas_DGGS/resultados_CARRIL_BICI/BICIS_08.shp")
+    shp = TestsMallasDGGS("/Users/javiermartinez/Documents/UNIVERSIDAD/TFG/mallas_DGGS/resultados_CARRIL_BICI/BICIS_08.shp")
     shp.test_API_polygon_08()
 
-    shp = ShpFile("/Users/javiermartinez/Documents/UNIVERSIDAD/TFG/mallas_DGGS/resultados_CARRIL_BICI/BICIS_09.shp")
+    shp = TestsMallasDGGS("/Users/javiermartinez/Documents/UNIVERSIDAD/TFG/mallas_DGGS/resultados_CARRIL_BICI/BICIS_09.shp")
     shp.test_API_polygon_09()
 
-    shp = ShpFile("/Users/javiermartinez/Documents/UNIVERSIDAD/TFG/mallas_DGGS/resultados_CARRIL_BICI/BICIS_10.shp")
+    shp = TestsMallasDGGS("/Users/javiermartinez/Documents/UNIVERSIDAD/TFG/mallas_DGGS/resultados_CARRIL_BICI/BICIS_10.shp")
     shp.test_API_polygon_10()
 
-    shp = ShpFile("/Users/javiermartinez/Documents/UNIVERSIDAD/TFG/mallas_DGGS/resultados_CARRIL_BICI/BICIS_11.shp")
+    shp = TestsMallasDGGS("/Users/javiermartinez/Documents/UNIVERSIDAD/TFG/mallas_DGGS/resultados_CARRIL_BICI/BICIS_11.shp")
     shp.test_API_polygon_11()
