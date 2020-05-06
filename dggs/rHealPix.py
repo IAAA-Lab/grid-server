@@ -1,11 +1,13 @@
-from numpy import pi, base_repr
-from itertools import product
-from pyproj import Proj
-from dggs.cell_ID import CellID
 import decimal
 import math
-from shapely.geometry.polygon import Polygon
+from itertools import product
+
+from numpy import pi, base_repr
+from pyproj import Proj
 from shapely.geometry import Point
+from shapely.geometry.polygon import Polygon
+
+from dggs.cell_ID import CellID
 
 
 class rHEALPix():

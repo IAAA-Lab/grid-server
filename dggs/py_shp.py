@@ -1,4 +1,5 @@
 import fiona
+
 from dggs.boundary import Boundary, OptimalBoundary
 from dggs.rHealPix import rHEALPix
 
