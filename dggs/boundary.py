@@ -1,8 +1,10 @@
-from dggs.dggs_auids.dggs_auids import cuids_to_bp_auid, bp_auid_to_cuids
+import networkx as nx
+
 from dggs.boundary_ID import BoundaryID, AUID
 from dggs.cell_ID import CellID
+from dggs.dggs_auids.dggs_auids import cuids_to_bp_auid, bp_auid_to_cuids
+from dggs.grid_stack import GridStack
 from dggs.rHealPix import rHEALPix
-import networkx as nx
 
 
 class Boundary:
@@ -53,8 +55,10 @@ class Boundary:
         return t
 
     def get_as_grid_stack(self):
-        # TODO
-        return self.grid_stack
+        """
+        :return:
+        """
+        return GridStack(self.boundary_ID)
 
     def get_min_refinement(self):
         """
@@ -253,3 +257,9 @@ class OptimalBoundary(Boundary):
         :return: OptimalBoundary, that is, a boundary that is the smallest one that delimits exactly its area.
         """
         return self
+
+    def AUID_to_ID(self):
+        boundary_ID = ''
+        for cell_ID in self.cells:
+            boundary_ID = boundary_ID + cell_ID.value
+        return boundary_ID

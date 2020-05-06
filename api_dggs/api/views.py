@@ -1,16 +1,16 @@
-from pymongo import MongoClient
+import re
 from rest_framework import viewsets, status
 from rest_framework.response import Response
+
 from api_dggs.api.serializer import BoundaryDatasetSerializer, BoundaryDataSerializer
 from dggs.boundary import Boundary
 from dggs.boundary_ID import BoundaryID
 from dggs.boundary_store import BoundaryStore
-import re
 
 
 class BoundaryDatasetsView(viewsets.ViewSet):
     serializer_class = BoundaryDatasetSerializer
-    store = BoundaryStore(MongoClient(port=27017).bds)
+    store = BoundaryStore()
 
     def list(self, request):
         try:
@@ -40,22 +40,85 @@ class BoundaryDatasetsView(viewsets.ViewSet):
             'status': 'Bad request',
         }, status=status.HTTP_400_BAD_REQUEST)
 
-    def retrieve(self, request, pk=None):
-        try:
-            boundaries_datasets = self.store.query_by_boundary_to_boundary_datasets(
-                Boundary(boundary_ID=BoundaryID(pk)))
-        except:
-            return Response({
-                'status': 'Bad request',
-            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        serializer = self.serializer_class(
-            instance=boundaries_datasets, many=True)
+    def retrieve(self, request, bds=None, pk=None):
+        if bds is not None:
+            if not re.match(r'^[A-Za-z0-9]+$', pk):
+                return Response({
+                    'status': 'Bad request',
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            try:
+                boundary_dataset = self.store.query_by_boundary_in_boundary_datasets(bds, Boundary(
+                    boundary_ID=BoundaryID(pk)))
+            except:
+                return Response({
+                    'status': 'Bad request',
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            serializer = self.serializer_class(
+                instance=boundary_dataset, many=True)
+        else:
+            try:
+                boundary_dataset = self.store.all_boundaries_in_dataset(pk)
+            except:
+                return Response({
+                    'status': 'Bad request',
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            serializer = self.serializer_class(
+                instance=boundary_dataset, many=True)
         return Response(serializer.data)
+
+    def update(self, request, bds=None, pk=None):
+        if bds is not None:
+            if not re.match(r'^[A-Za-z0-9]+$', pk):
+                return Response({
+                    'status': 'Bad request',
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            try:
+                boundary_dataset = self.store.query_by_boundary_in_boundary_datasets(bds, Boundary(
+                    boundary_ID=BoundaryID(pk)))
+            except:
+                return Response({
+                    'status': 'Bad request',
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            serializer = self.serializer_class(
+                instance=boundary_dataset, many=True)
+
+        return Response(serializer.data)
+
+    def destroy(self, request, bds=None, pk=None):
+        if bds is not None:
+            if not re.match(r'^[A-Za-z0-9]+$', pk):
+                return Response({
+                    'status': 'Bad request',
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            try:
+                result = self.store.delete_boundary_in_boundary_datasets(bds, Boundary(boundary_ID=BoundaryID(pk)))
+                if result == 0:
+                    return Response(status=status.HTTP_404_NOT_FOUND)
+                else:
+                    return Response(status=status.HTTP_204_NO_CONTENT)
+            except:
+                return Response({
+                    'status': 'Bad request',
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            try:
+                result = self.store.delete_boundary_dataset(pk)
+                if result == 0:
+                    return Response(status=status.HTTP_404_NOT_FOUND)
+                else:
+                    return Response(status=status.HTTP_204_NO_CONTENT)
+            except:
+                return Response({
+                    'status': 'Bad request',
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class BoundaryView(viewsets.ViewSet):
     serializer_class = BoundaryDataSerializer
-    store = BoundaryStore(MongoClient(port=27017).bds)
+    store = BoundaryStore()
 
     def list(self, request):
         dlx = self.request.query_params.get('dlx', None)
@@ -105,7 +168,7 @@ class BoundaryView(viewsets.ViewSet):
 
         return Response(serializer.data)
 
-    def retrieve(self, request, pk=None):
+    def retrieve(self, request, pk=None, boundary=None):
         if not re.match(r'^[A-Za-z0-9]+$', pk):
             return Response({
                 'status': 'Bad request',
@@ -123,7 +186,6 @@ class BoundaryView(viewsets.ViewSet):
         return Response(serializer.data)
 
     def destroy(self, request, pk=None):
-        print('Destroy')
 
         if not re.match(r'^[A-Za-z0-9]+$', pk):
             return Response({
@@ -131,8 +193,7 @@ class BoundaryView(viewsets.ViewSet):
             }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            result = self.store.delete(Boundary(boundary_ID=BoundaryID(pk)))
-            print()
+            result = self.store.delete_boundary(Boundary(boundary_ID=BoundaryID(pk)))
             if result == 0:
                 return Response(status=status.HTTP_404_NOT_FOUND)
             else:

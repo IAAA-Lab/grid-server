@@ -1,10 +1,11 @@
-import networkx as nx
 import base64
-import zlib
+import functools
 import hashlib
+import zlib
+
+import networkx as nx
 from networkx.generators.trees import NIL
 from networkx.utils import generate_unique_node
-import functools
 
 
 def generate_BP(T, root, pars, root_name, nil_name, with_opening_par):

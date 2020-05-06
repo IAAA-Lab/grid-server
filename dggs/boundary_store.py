@@ -1,22 +1,21 @@
 import pymongo
-from bson import ObjectId
+from pymongo import MongoClient
 
 from dggs.boundary import OptimalBoundary
 from dggs.boundary_ID import AUID
 from dggs.boundary_dataset import BoundaryDataSet
 from dggs.data import Data
 from dggs.rHealPix import rHEALPix
-
+import mongodb_config
 
 class BoundaryStore:
 
-    def __init__(self, bds, dggs=rHEALPix(N_side=3, north_square=0, south_square=0)):
+    def __init__(self, dggs=rHEALPix(N_side=3, north_square=0, south_square=0)):
         """
-        :param bds: database
         :param dggs: Discrete Global Grid System, rHEALPix by default
         """
         self.dggs = dggs
-        self.db = bds
+        self.db = MongoClient(mongodb_config.MONGODB_CONFIG['host']).bds
 
     def get_Boundary_Data(self, boundary):
         """
@@ -36,14 +35,13 @@ class BoundaryStore:
         """
 
         # Store boundaryDataSet
-        boundary_dataset_id = ObjectId()
         _boundaryDataSet = {
-            "_id": boundary_dataset_id,
+            "_id": b_dataset.id,
         }
         self.db.b_data_sets.insert_one(_boundaryDataSet)
 
         # Store boundaries
-        for (boundary, data) in b_dataset.get_all():
+        for (boundary, data) in b_dataset.get_boundaries_and_data():
             _boundary = {
                 "auid": boundary.boundary_ID.value,
                 "bbox": {
@@ -51,11 +49,14 @@ class BoundaryStore:
                     "coordinates": boundary.get_bbox(),
                 },
                 "data": data.content,
-                "boundary_dataset_id": boundary_dataset_id
+                "boundary_dataset_id": b_dataset.id
             }
             self.db.boundaries.insert_one(_boundary)
         self.db.boundaries.create_index([("bbox", pymongo.GEOSPHERE)])
 
+    """
+    BOUNDARIES
+    """
     def all_boundaries(self):
         """
         :return: List of all stored Boundaries and Data associated
@@ -111,6 +112,37 @@ class BoundaryStore:
             boundaries.append((boundary, data))
         return boundaries
 
+    def delete_boundary(self, boundary):
+        """
+        :param boundary: Boundary or OptimalBoundary. If it is not optimal, it is optimized before making the query.
+        :return: Delete stored boundaries that have the same identifier as the param
+        """
+        if boundary.is_optimal():
+            optimal_boundary = boundary
+        else:
+            optimal_boundary = boundary.optimize()
+
+        result = self.db.boundaries.delete_many({"auid": optimal_boundary.boundary_ID.value})
+
+        return result.deleted_count
+
+    """
+    BOUNDARIY_DATASETS
+    """
+    def all_boundary_datasets(self):
+        """
+        :return: List of all stored BoundaryDatasets
+        """
+        boundary_data_sets = []
+        boundaries_datasets_founded = self.db.b_data_sets.find()
+        for boundary_dataset in boundaries_datasets_founded:
+            bds = BoundaryDataSet(id=boundary_dataset["_id"])
+            boundaries_in_bds_founded = self.db.boundaries.find({"boundary_dataset_id": boundary_dataset["_id"]})
+            for boundary in boundaries_in_bds_founded:
+                bds.add(OptimalBoundary(boundary_ID=AUID(boundary["auid"])), Data(boundary["data"]))
+            boundary_data_sets.append(bds)
+        return boundary_data_sets
+
     def query_by_boundary_to_boundary_datasets(self, boundary):
         """
         :param boundary: Boundary or OptimalBoundary. If it is not optimal, it is optimized before making the query.
@@ -134,33 +166,88 @@ class BoundaryStore:
             boundary_data_sets.append(bds)
         return boundary_data_sets
 
-    def all_boundary_datasets(self):
+    def all_boundaries_in_dataset(self, id):
         """
-        :return: List of all stored BoudnariesDatasets
+        :param id: identifier of the BoundaryDataset
+        :return: List of tuples with stored boundaries and data associated stored in the BoundaryDataset with that id.
         """
+        boundaries_datasets_founded = self.db.b_data_sets.find({"_id": id})
         boundary_data_sets = []
-        boundaries_datasets_founded = self.db.b_data_sets.find()
         for boundary_dataset in boundaries_datasets_founded:
-            bds = BoundaryDataSet()
+            bds = BoundaryDataSet(id=id)
             boundaries_in_bds_founded = self.db.boundaries.find({"boundary_dataset_id": boundary_dataset["_id"]})
             for boundary in boundaries_in_bds_founded:
                 bds.add(OptimalBoundary(boundary_ID=AUID(boundary["auid"])), Data(boundary["data"]))
             boundary_data_sets.append(bds)
         return boundary_data_sets
 
-    def delete(self, boundary):
+    def query_by_boundary_in_boundary_datasets(self, id, boundary):
         """
+        :param id: identifier of the BoundaryDataset
         :param boundary: Boundary or OptimalBoundary. If it is not optimal, it is optimized before making the query.
-        :return: Delete stored boundaries that have the same identifier as the param
+        :return: Boundaries and data associated stored in the BoundaryDataset with that id.
         """
         if boundary.is_optimal():
             optimal_boundary = boundary
         else:
             optimal_boundary = boundary.optimize()
 
-        result = self.db.boundaries.delete_many({"auid": optimal_boundary.boundary_ID.value})
+        boundaries_datasets_founded = self.db.b_data_sets.find({"_id": id})
+        boundary_data_sets = []
+        for boundary_dataset in boundaries_datasets_founded:
+            bds = BoundaryDataSet(id=id)
+            boundaries_in_bds_founded = self.db.boundaries.find({"boundary_dataset_id": boundary_dataset["_id"],
+                                                                "auid": optimal_boundary.boundary_ID.value})
+            for boundary in boundaries_in_bds_founded:
+                bds.add(OptimalBoundary(boundary_ID=AUID(boundary["auid"])), Data(boundary["data"]))
+            boundary_data_sets.append(bds)
+        return boundary_data_sets
+
+    def update_boundary_dataset(self, id):
+        """
+        :param id: identifier of the BoundaryDataset
+        :return: Update the BoundaryDataset with that id.
+        """
+
+        # TODO
+
+    def update_boundary_in_boundary_datasets(self, id, boundary):
+        """
+        :param id: identifier of the BoundaryDataset
+        :param boundary: Boundary or OptimalBoundary. If it is not optimal, it is optimized before making the query.
+        :return: Update the stored boundary that have the same identifier as the param in the BoundaryDataset with that id.
+        """
+
+        # TODO
+
+    def delete_boundary_dataset(self, id):
+        """
+        :param id: identifier of the BoundaryDataset
+        :return: Delete the BoundaryDataset with that id and all the boundaries and data  in it.
+        """
+        result1 = self.db.b_data_sets.delete_many({"_id": id})
+
+        if result1.deleted_count > 0:
+            self.db.boundaries.delete_many({"boundary_dataset_id": id})
+
+        return result1.deleted_count
+
+    def delete_boundary_in_boundary_datasets(self, id, boundary):
+        """
+        :param id: identifier of the BoundaryDataset
+        :param boundary: Boundary or OptimalBoundary. If it is not optimal, it is optimized before making the query.
+        :return: Delete the stored boundary that have the same identifier as the param in the BoundaryDataset with that id.
+        """
+        if boundary.is_optimal():
+            optimal_boundary = boundary
+        else:
+            optimal_boundary = boundary.optimize()
+
+        result = self.db.boundaries.delete_many({"boundary_dataset_id": id,
+                                                                "auid": optimal_boundary.boundary_ID.value})
 
         return result.deleted_count
+
 
     def dropAll(self):
         """

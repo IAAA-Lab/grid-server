@@ -1,21 +1,24 @@
-from dggs.boundary import OptimalBoundary
-from dggs.boundary_ID import BoundaryID
-from dggs.data import Data
+from dggs.rHealPix import rHEALPix
 
 
 class BoundaryDataSet:
 
-    def __init__(self, boundary_data_set=None):
+    def __init__(self, id,  boundary_data_set=None, dggs=rHEALPix(N_side=3, north_square=0, south_square=0)):
         """
         :param boundary_data_set: dictionary with optimal boundary identifier as key
         and OptimalBoundary and associated Data pairs as value:
         {
             BoundaryID.value: (OptimalBoundary,Data)
         }
+        :param dggs: Discrete Global Grid System, rHEALPix by default
         """
+        assert id is not None
+        self.id = id
+
         if boundary_data_set is None:
             boundary_data_set = {}
         self.boundary_data_set = boundary_data_set
+        self.dggs = dggs
 
     def add(self, boundary, data):
         """
@@ -30,14 +33,58 @@ class BoundaryDataSet:
             optimal_boundary = boundary.optimize()
             self.boundary_data_set[optimal_boundary.boundary_ID.value] = (optimal_boundary, data)
 
-    def get_all(self):
+    def add_list(self, boundary_data_list):
+        """
+        Add all pairs (Boundary, Data) in a list
+        :param boundary_data_list: list of boundaries and associated data tuples
+        If it is not optimal, it is optimized before saving it in the dictionary.
+        """
+        for (boundary, data) in boundary_data_list:
+            if boundary.is_optimal():
+                self.boundary_data_set[boundary.boundary_ID.value] = (boundary, data)
+            else:
+                optimal_boundary = boundary.optimize()
+                self.boundary_data_set[optimal_boundary.boundary_ID.value] = (optimal_boundary, data)
+
+    def get_boundaries(self):
+        """
+        :return: list with all the boundaries of the set
+        """
+        boundary_list = []
+        for boundary_ID, (boundary, data) in self.boundary_data_set.items():
+            boundary_list.append(boundary)
+        return boundary_list
+
+    def get_boundaries_and_data(self):
         """
         :return: list of tuples (Boundary, Data) with all the boundaries and data of the set
         """
-        list = []
+        boundary_data_list = []
         for boundary_ID, value in self.boundary_data_set.items():
-            list.append(value)
-        return list
+            boundary_data_list.append(value)
+        return boundary_data_list
+
+    def get_min_refinement(self):
+        """
+        :return: integer that represents the minimum refinement of the set
+        """
+        (boundary, data) = list(self.boundary_data_set.values())[0]
+        min_refinement = boundary.get_min_refinement()
+        for boundary_ID, (boundary, data) in self.boundary_data_set.items():
+            if boundary.get_min_refinement() < min_refinement:
+                min_refinement = boundary.get_min_refinement()
+        return min_refinement
+
+    def get_max_refinement(self):
+        """
+        :return: integer that represents the maximum refinement of the set
+        """
+        (boundary, data) = list(self.boundary_data_set.values())[0]
+        max_refinement = boundary.get_max_refinement()
+        for boundary_ID, (boundary, data) in self.boundary_data_set.items():
+            if boundary.get_min_refinement() > max_refinement:
+                max_refinement = boundary.get_max_refinement()
+        return max_refinement
 
     def get_boundary_data(self, boundary_ID):
         """
