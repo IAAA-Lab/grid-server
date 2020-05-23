@@ -1,11 +1,10 @@
 import decimal
 import math
 from itertools import product
-
 from numpy import pi, base_repr
 from pyproj import Proj
-from shapely.geometry import Point
-from shapely.geometry.polygon import Polygon
+import matplotlib.path as mplPath
+import numpy as np
 
 from dggs.cell_ID import CellID
 
@@ -43,7 +42,7 @@ class rHEALPix():
         # the refinement must be at least ⌈log (Rq2 (2π/3) A−1) / (2 log (Nside))⌉
         self.max_area = max_area
         self.max_refinement = int(math.ceil(
-            math.log(rHEALPix.Ratio ** 2 * (2 * pi / 3) * self.max_area ** -1) / (2 * math.log(N_side))))
+            math.log(rHEALPix.R_q ** 2 * (2 * pi / 3) * self.max_area ** -1) / (2 * math.log(N_side))))
 
         # Row-column coordinates of cells with a refinement greater than 0.
         rowcol_cells = {}
@@ -56,23 +55,23 @@ class rHEALPix():
         # Coordinates of the upper left vertices of the refinement cells 0
         self.R0_ul_vertex = {
             self.cells_R0[0]: ((-pi + self.north_square * pi / 2) * self.Ratio, (3 * pi / 4) * self.Ratio),
-            self.cells_R0[1]: (-pi * self.Ratio , (pi / 4) * self.Ratio),
+            self.cells_R0[1]: (-pi * self.Ratio, (pi / 4) * self.Ratio),
             self.cells_R0[2]: ((-pi / 2) * self.Ratio, (pi / 4) * self.Ratio),
-            self.cells_R0[3]: (0 * self.Ratio , (pi / 4) * self.Ratio),
+            self.cells_R0[3]: (0 * self.Ratio, (pi / 4) * self.Ratio),
             self.cells_R0[4]: ((pi / 2) * self.Ratio, (pi / 4) * self.Ratio),
-            self.cells_R0[5]: ((-pi + self.south_square * pi / 2) * self.Ratio, (-pi / 4)* self.Ratio)
+            self.cells_R0[5]: ((-pi + self.south_square * pi / 2) * self.Ratio, (-pi / 4) * self.Ratio)
         }
 
         # Unfolded cube polygon
-        self.polygon = Polygon([(-pi * rHEALPix.Ratio, -3 / 4 * pi * rHEALPix.Ratio),
-                           (-1 / 2 * pi * rHEALPix.Ratio, -3 / 4 * pi * rHEALPix.Ratio),
-                           (-1 / 2 * pi * rHEALPix.Ratio, -1 / 4 * pi * rHEALPix.Ratio),
-                           (pi * rHEALPix.Ratio, -1 / 4 * pi * rHEALPix.Ratio),
-                           (pi * rHEALPix.Ratio, 1 / 4 * pi * rHEALPix.Ratio),
-                           (-1 / 2 * pi * rHEALPix.Ratio, 1 / 4 * pi * rHEALPix.Ratio),
-                           (-1 / 2 * pi * rHEALPix.Ratio, 3 / 4 * pi * rHEALPix.Ratio),
-                           (-pi * rHEALPix.Ratio, 3 / 4 * pi * rHEALPix.Ratio),
-                           (-pi * rHEALPix.Ratio, -3 / 4 * pi * rHEALPix.Ratio)])
+        self.polygon = mplPath.Path(np.array([(-pi * rHEALPix.Ratio, -3 / 4 * pi * rHEALPix.Ratio),
+                                              (-1 / 2 * pi * rHEALPix.Ratio, -3 / 4 * pi * rHEALPix.Ratio),
+                                              (-1 / 2 * pi * rHEALPix.Ratio, -1 / 4 * pi * rHEALPix.Ratio),
+                                              (pi * rHEALPix.Ratio, -1 / 4 * pi * rHEALPix.Ratio),
+                                              (pi * rHEALPix.Ratio, 1 / 4 * pi * rHEALPix.Ratio),
+                                              (-1 / 2 * pi * rHEALPix.Ratio, 1 / 4 * pi * rHEALPix.Ratio),
+                                              (-1 / 2 * pi * rHEALPix.Ratio, 3 / 4 * pi * rHEALPix.Ratio),
+                                              (-pi * rHEALPix.Ratio, 3 / 4 * pi * rHEALPix.Ratio),
+                                              (-pi * rHEALPix.Ratio, -3 / 4 * pi * rHEALPix.Ratio)]))
 
         self.proj = Proj(proj='rhealpix', a=1, ellps='WGS84', south_square=self.south_square,
                          north_square=self.north_square, lon_0=0, preserve_units=False)
@@ -84,6 +83,9 @@ class rHEALPix():
         """
         assert refinement >= 0
         return self.Ratio * (pi / 2) * self.N_side ** (-refinement)
+
+    def refinement_for_area(self, area):
+        return int(math.ceil(math.log(rHEALPix.R_q ** 2 * (2 * pi / 3) * area ** -1) / (2 * math.log(self.N_side))))
 
     def rowcol(self, cell):
         """
@@ -267,9 +269,8 @@ class rHEALPix():
         round_up_y = False
         i = 0
         for point in bounds:
-            point = Point(self.round_coord(point[0], 8, round_up_x),
-                          self.round_coord(point[1], 8, round_up_y))
-            if not self.polygon.contains(point):
+            if not self.polygon.contains_point(
+                    (self.round_coord(point[0], 8, round_up_x), self.round_coord(point[1], 8, round_up_y))):
                 return False
             round_up_x = not round_up_x
             i = i + 1
@@ -291,9 +292,9 @@ class rHEALPix():
         # as fractions of the width of refinement 0 cell.
         row_id, col_id = self.rowcol(cell)
         dx = sum(self.N_side ** (-i) * col_id[i]
-                for i in range(1, refinement + 1))
+                 for i in range(1, refinement + 1))
         dy = sum(self.N_side ** (-i) * row_id[i]
-                for i in range(1, refinement + 1))
+                 for i in range(1, refinement + 1))
 
         # Coordinates of the ul_vertex of cell.
         x = x0 + self.cell_width(0) * dx
@@ -339,7 +340,7 @@ class rHEALPix():
 
     def get_geodetic_coordinates_from_bbox(self, bounds):
         """
-        :param bounds: list of vertices (x,y) of the bounding box
+        :param bounds: list of vertices (x,y) of the bounding box  (projected coordinates (rHEALPix))
         :return: geodetic coordinates from the points, bounds, that define a bounding box.
                 (upper left, upper right, lower left, lower right, nucleus)
         """
@@ -350,7 +351,7 @@ class rHEALPix():
         for coord in bounds:
             geodetic_coordinate.append(
                 list(self.proj(self.round_coord(coord[0], 8, round_up_x), self.round_coord(coord[1], 8, round_up_y),
-                       inverse=True)))
+                               inverse=True)))
             round_up_x = not round_up_x
             i = i + 1
             if i == 2:
@@ -448,3 +449,87 @@ class rHEALPix():
         for i in range(refinement):
             cell = cell + str(self.rowcol_cells[(int(row_id[i]), int(col_id[i]))])
         return CellID(cell)
+
+    def get_cell_from_projected_point(self, refinement, point):
+        """
+        :param refinement: the refinement, minimum 0, of a cell
+        :param point: coordinates (x, y) of a point
+        :return: CellId containing the point
+        """
+        assert refinement >= 0
+
+        x, y = point  # projected coordinates (rHEALPix)
+
+        # Given a point (x,y) in the rHEALPix planar image and an integer i ≥
+        # 0, we can compute the ID of the refinement i cell that contains (x, y) as follows.
+        #
+        # First compute the refinement 0 cell containing (x, y).
+        cell = self.get_c0_contains_p((x, y))
+        if refinement == 0:
+            return CellID(cell)
+
+        # Then compute the horizontal and vertical distances from (x, y) to ul(cell):
+        dx = abs(self.R0_ul_vertex[cell][0] - x)
+        dy = abs(self.R0_ul_vertex[cell][1] - y)
+
+        if dx == 1:
+            dx = dx - (0.5 * self.cell_width(self.max_refinement))
+        if dy == 1:
+            dy = dy - (0.5 * self.cell_width(self.max_refinement))
+
+        # Then find out how far along the width w = Rqπ/2 of cell lie dx and dy by computing
+        # the base Nside expansions (0.s)Nside and (0.t)Nside of dx/(Rπ/2) and dy/(Rπ/2), respectively.
+        #
+        # Truncating s and t at i digits then gives the column and row IDs, respectively,
+        # of the refinement i cell containing (x, y):
+
+        w = self.cell_width(0)
+        n_cells = self.N_side ** refinement
+
+        row_id = base_repr(math.trunc(dy / w * n_cells), self.N_side)
+        col_id = base_repr(math.trunc(dx / w * n_cells), self.N_side)
+
+        # Set the amount of zeros according to the refinement
+        row_id = '0' * (refinement - len(row_id)) + row_id
+        col_id = '0' * (refinement - len(col_id)) + col_id
+
+        # Use the col and row IDs of cell to get the cell_id.
+        for i in range(refinement):
+            cell = cell + str(self.rowcol_cells[(int(row_id[i]), int(col_id[i]))])
+        return CellID(cell)
+
+# a = int(math.ceil(
+#             math.log( 6374581.4671 ** 2 * (2 * pi / 3) * 1 ** -1) / (2 * math.log(3))))
+# b = 6374581.4671 * (pi / 2) * 3 ** (-15)
+# c = 0.998882147091 * (pi / 2) * 3 ** (-15)
+# print(a)
+# print(b)
+# print(c)
+
+
+# from math import cos, sin, asin, sqrt, radians, degrees
+#
+# def calc_distance(lat1, lon1, lat2, lon2):
+#     """
+#     Calculate the great circle distance between two points
+#     on the earth (specified in decimal degrees)
+#     """
+#     # convert decimal degrees to radians
+#     lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
+#     # haversine formula
+#     dlon = lon2 - lon1
+#     dlat = lat2 - lat1
+#     a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
+#     c = 2 * asin(sqrt(a))
+#     m = 6374581.4671 * c
+#     return m
+#
+# m = calc_distance(41.8583333, -1.2139773, 41.8583333, -0.5469303)
+# print(m)
+# print(m/131)
+#
+# refinement_level = int(math.ceil(
+#             math.log( 6374581.4671 ** 2 * (2 * pi / 3) * ((m/131) ** 2) ** -1) / (2 * math.log(3))))
+# print(refinement_level)
+# cell_width = 6374581.4671 * (pi / 2) * 3 ** (-refinement_level)
+# print(cell_width)

@@ -1,3 +1,8 @@
+import json
+
+from dggs.boundary import Boundary, OptimalBoundary
+from dggs.boundary_ID import BoundaryID, AUID
+from dggs.data import Data
 from dggs.rHealPix import rHEALPix
 
 
@@ -5,6 +10,7 @@ class BoundaryDataSet:
 
     def __init__(self, id,  boundary_data_set=None, dggs=rHEALPix(N_side=3, north_square=0, south_square=0)):
         """
+        :param id: boundary dataset identifier
         :param boundary_data_set: dictionary with optimal boundary identifier as key
         and OptimalBoundary and associated Data pairs as value:
         {
@@ -109,3 +115,36 @@ class BoundaryDataSet:
         """
         for boundary_ID, (boundary, data) in self.boundary_data_set.items():
             print(boundary_ID, data.content)
+
+    def toJSON(self, optimal):
+        boundary_list = []
+        for AUID, (boundary, data) in self.boundary_data_set.items():
+            if optimal:
+                dic = {
+                    'AUID': AUID,
+                    'boundary': boundary.AUID_to_ID(),
+                    'data': data.content
+                }
+            else:
+                dic = {
+                    'boundary': boundary.AUID_to_ID(),
+                    'data': data.content
+                }
+            boundary_list.append(dic)
+
+        bds = {
+            'id': self.id,
+            'boundary_data_set': boundary_list,
+        }
+        return json.dumps(bds)
+
+    def fromJSON(self, bds_json):
+        bds = json.loads(bds_json)
+        self.boundary_data_set = {}
+        self.id = bds['id']
+        boundary_list = bds['boundary_data_set']
+
+        for boundary in boundary_list:
+            self.add(OptimalBoundary(boundary_ID=AUID(boundary['AUID'])), Data(boundary['data']))
+
+        return self

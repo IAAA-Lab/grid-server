@@ -1,5 +1,4 @@
 import re
-
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
@@ -38,6 +37,13 @@ class BoundaryDatasetSerializer(serializers.Serializer):
         bds = BoundaryDataSet(id=self.validated_data['id'], boundary_data_set=self.validated_data['boundary_data_set'])
         store.insert(bds)
 
+class BoundaryDatasetUpdateSerializer(serializers.Serializer):
+    boundary_data_set = BoundaryDatasetField()
+
+    def save(self, store, bds_id):
+            bds = BoundaryDataSet(id=bds_id, boundary_data_set=self.validated_data['boundary_data_set'])
+            store.update_boundary_dataset(bds)
+
 
 class BoundaryDataSerializer(serializers.Serializer):
     AUID = serializers.SerializerMethodField()
@@ -52,3 +58,18 @@ class BoundaryDataSerializer(serializers.Serializer):
 
     def get_data(self, obj):
         return obj[1].content
+
+
+class DataField(serializers.Field):
+    def to_representation(self, data):
+        return data
+
+    def to_internal_value(self, data):
+        return data
+
+class BoundaryDataUpdateSerializer(serializers.Serializer):
+    data = DataField()
+
+    def save(self, store, bds_id, boundary_id):
+        store.update_boundary_in_boundary_datasets(bds_id, Boundary(boundary_ID=BoundaryID(boundary_id)).optimize(),
+                                                   Data(self.validated_data['data']))

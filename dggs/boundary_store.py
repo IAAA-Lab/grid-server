@@ -127,7 +127,7 @@ class BoundaryStore:
         return result.deleted_count
 
     """
-    BOUNDARIY_DATASETS
+    BOUNDARY_DATASETS
     """
     def all_boundary_datasets(self):
         """
@@ -203,22 +203,40 @@ class BoundaryStore:
             boundary_data_sets.append(bds)
         return boundary_data_sets
 
-    def update_boundary_dataset(self, id):
+    def update_boundary_dataset(self, bds):
         """
-        :param id: identifier of the BoundaryDataset
+        :param bds:
         :return: Update the BoundaryDataset with that id.
         """
+        boundaries_datasets_founded = self.db.b_data_sets.find({"_id": bds.id})
+        for boundary_dataset in boundaries_datasets_founded:
+            self.db.boundaries.delete_many({"boundary_dataset_id": bds.id})
+            for (boundary, data) in bds.get_boundaries_and_data():
+                _boundary = {
+                    "auid": boundary.boundary_ID.value,
+                    "bbox": {
+                        "type": "Polygon",
+                        "coordinates": boundary.get_bbox(),
+                    },
+                    "data": data.content,
+                    "boundary_dataset_id": boundary_dataset["_id"]
+                }
+                self.db.boundaries.insert_one(_boundary)
+            self.db.boundaries.create_index([("bbox", pymongo.GEOSPHERE)])
 
-        # TODO
-
-    def update_boundary_in_boundary_datasets(self, id, boundary):
+    def update_boundary_in_boundary_datasets(self, bds_id, boundary, data):
         """
         :param id: identifier of the BoundaryDataset
         :param boundary: Boundary or OptimalBoundary. If it is not optimal, it is optimized before making the query.
         :return: Update the stored boundary that have the same identifier as the param in the BoundaryDataset with that id.
         """
+        boundaries_datasets_founded = self.db.b_data_sets.find({"_id": bds_id})
+        for boundary_dataset in boundaries_datasets_founded:
+            myquery = {"auid": boundary.boundary_ID.value, "boundary_dataset_id": boundary_dataset["_id"],}
+            newvalues = {"$set": {"data": data.content}}
 
-        # TODO
+            return self.db.boundaries.update_many(myquery, newvalues)
+
 
     def delete_boundary_dataset(self, id):
         """

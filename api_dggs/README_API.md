@@ -3,6 +3,8 @@
   - [POST /bdatasets](#post-boundaries_dataset)
   - [GET /bdatasets/[bdatasets_id]](#get-boundaries_dataset)
   - [GET /bdatasets/[bdatasets_id]/[boundary_id]](#get-boundary-in-boundaries_dataset)  
+  - [PUT /bdatasets/[bdatasets_id]](#put-boundaries_dataset)
+  - [PUT /bdatasets/[bdatasets_id]/[boundary_id]](#put-boundary-in-boundaries_dataset)  
   - [DELETE /bdatasets/[bdatasets_id]](#delete-boundaries_dataset)
   - [DELETE /bdatasets/[bdatasets_id]/[boundary_id]](#delete-boundary-in-boundaries_dataset)  
   - [GET /boundaries](#get-boundaries)
@@ -149,6 +151,60 @@ Response body:
           ]
       }
     ]
+    
+### PUT /bdatasets/[bdatasets_id]
+
+Update the BoundaryDataset with that id.
+
+#### Parameters
+
+| Parameter | Parameter Type | Description |
+| ------------- | ------------- | ------------- |
+|  bdatasets_id | Path  | BoundaryDataset identifier
+
+Example: PUT  http://example.com/bdatasets/id_1
+
+Request body:
+
+    {
+          "boundary_data_set": [
+              {
+                  "boundary": "P1P2P3",
+                  "data": "test"
+              },
+              {
+                  "boundary": "Q14Q15",
+                  "data": "test"
+              },
+              {
+                  "boundary": "O22O23",
+                  "data": "test"
+              }
+          ]
+     }
+
+
+
+### PUT /bdatasets/[bdatasets_id]/[boundary_id]
+
+Update the Boundary with that id, in the BoundaryDataset with that id.
+
+#### Parameters
+
+| Parameter | Parameter Type | Description |
+| ------------- | ------------- | ------------- |
+|  bdatasets_id | Path  | BoundaryDataset identifier
+|  boundary_id | Path  | Boundary identifier (Cell identifier sequence)
+
+Example: PUT  http://example.com/bdatasets/id_1/P10P11P2
+
+Request body:
+
+    {
+          {
+              "data": "test2"
+          }
+     }
 
 ### DELETE /bdatasets/[bdatasets_id]
 

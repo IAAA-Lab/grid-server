@@ -164,6 +164,24 @@ def test_get_boundary_data_list():
 
     assert b_dataset.get_boundary_data_list([boundary1.boundary_ID, boundary3.boundary_ID]) == [data, data2]
 
+def test_to_JSON():
+    boundary1 = OptimalBoundary(cells=[CellID('N'), CellID('O0'), CellID('P123'), CellID('S34567')])
+    boundary2 = OptimalBoundary(cells=[CellID('O35'), CellID('P234')])
+    boundary3 = OptimalBoundary(cells=[CellID('S034'), CellID('S57')])
+    data = Data('')
+
+    b_ds = {
+        boundary1.boundary_ID.value: (boundary1, data),
+        boundary2.boundary_ID.value: (boundary2, data),
+        boundary3.boundary_ID.value: (boundary3, data)
+    }
+    b_dataset = BoundaryDataSet('id', b_ds)
+    print(b_dataset.toJSON())
+
+    b_dataset_2 = BoundaryDataSet('').fromJSON(b_dataset.toJSON())
+    b_dataset_2.print()
+
+
 
 if __name__ == "__main__":
     test_boundary_dataset()
@@ -175,3 +193,4 @@ if __name__ == "__main__":
     test_get_max_refinement()
     test_get_boundary_data()
     test_get_boundary_data_list()
+    # test_to_JSON()

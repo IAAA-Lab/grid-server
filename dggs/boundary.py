@@ -37,13 +37,18 @@ class Boundary:
                 else:
                     cell_ID = cell_ID + char
             cells.append(CellID(cell_ID))
-            self.cells = cells
+            cell_ids = sorted([cell.value for cell in cells])
+            self.cells = [CellID(id) for id in cell_ids]
 
         if boundary_ID is None:
+            cell_ids = sorted([cell.value for cell in cells])
+            self.cells = [CellID(id) for id in cell_ids]
             boundary_ID = ''
             for cell_ID in cells:
                 boundary_ID = boundary_ID + cell_ID.value
             self.boundary_ID = BoundaryID(boundary_ID)
+
+
 
     def get_as_tree(self):
         """
@@ -182,13 +187,13 @@ class Boundary:
             top_cell, below_cell, left_cell, right_cell = self.get_limit_cells()
 
             if top_cell == left_cell:
-                ul = self.dggs.get_cell_projected_coordinates(top_cell)[0]  # TODO ¿Mejor vértice o centro?
+                ul = self.dggs.get_cell_projected_coordinates(top_cell)[0]
             else:
                 ul = (self.dggs.get_cell_projected_coordinates(left_cell)[0][0],
                       self.dggs.get_cell_projected_coordinates(top_cell)[0][1])
 
             if below_cell == right_cell:
-                dr = self.dggs.get_cell_projected_coordinates(below_cell)[3]  # TODO ¿Mejor vértice o centro?
+                dr = self.dggs.get_cell_projected_coordinates(below_cell)[3]
             else:
                 dr = (self.dggs.get_cell_projected_coordinates(right_cell)[3][0],
                       self.dggs.get_cell_projected_coordinates(below_cell)[3][1])
@@ -196,6 +201,7 @@ class Boundary:
             bounds = [ul, dr]
             bbox_bounds = [[bounds[0][0], bounds[0][1]], [bounds[1][0], bounds[0][1]],
                            [bounds[0][0], bounds[1][1]], [bounds[1][0], bounds[1][1]]]
+            print(bbox_bounds)
             if self.dggs.check_bounds(bbox_bounds):
                 bbox_bounds = self.dggs.get_geodetic_coordinates_from_bbox(bbox_bounds)
             else:

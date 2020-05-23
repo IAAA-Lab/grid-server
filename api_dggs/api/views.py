@@ -2,7 +2,8 @@ import re
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 
-from api_dggs.api.serializer import BoundaryDatasetSerializer, BoundaryDataSerializer
+from api_dggs.api.serializer import BoundaryDatasetSerializer, BoundaryDataSerializer,\
+    BoundaryDatasetUpdateSerializer, BoundaryDataUpdateSerializer
 from dggs.boundary import Boundary
 from dggs.boundary_ID import BoundaryID
 from dggs.boundary_store import BoundaryStore
@@ -10,6 +11,8 @@ from dggs.boundary_store import BoundaryStore
 
 class BoundaryDatasetsView(viewsets.ViewSet):
     serializer_class = BoundaryDatasetSerializer
+    update_bds_serializer_class = BoundaryDatasetUpdateSerializer
+    update_boundary_serializer_class = BoundaryDataUpdateSerializer
     store = BoundaryStore()
 
     def list(self, request):
@@ -68,23 +71,41 @@ class BoundaryDatasetsView(viewsets.ViewSet):
         return Response(serializer.data)
 
     def update(self, request, bds=None, pk=None):
-        if bds is not None:
-            if not re.match(r'^[A-Za-z0-9]+$', pk):
+            if bds is not None:
+                print(request.data)
+                serializer = self.update_boundary_serializer_class(data=request.data)
+                if serializer.is_valid():
+                    try:
+                        result = serializer.save(store=self.store, bds_id=bds, boundary_id=pk)
+                        if result == 0:
+                            return Response(status=status.HTTP_404_NOT_FOUND)
+                    except:
+                        return Response({
+                            'status': 'Bad request',
+                        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    return Response(
+                        serializer.data, status=status.HTTP_201_CREATED
+                    )
+                return Response({
+                    'status': 'Bad request',
+                }, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                serializer = self.update_bds_serializer_class(data=request.data)
+                if serializer.is_valid():
+                    try:
+                        serializer.save(store=self.store, bds_id=pk)
+                    except:
+                        return Response({
+                            'status': 'Bad request',
+                        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    return Response(
+                        serializer.data, status=status.HTTP_201_CREATED
+                    )
                 return Response({
                     'status': 'Bad request',
                 }, status=status.HTTP_400_BAD_REQUEST)
 
-            try:
-                boundary_dataset = self.store.query_by_boundary_in_boundary_datasets(bds, Boundary(
-                    boundary_ID=BoundaryID(pk)))
-            except:
-                return Response({
-                    'status': 'Bad request',
-                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-            serializer = self.serializer_class(
-                instance=boundary_dataset, many=True)
 
-        return Response(serializer.data)
 
     def destroy(self, request, bds=None, pk=None):
         if bds is not None:
