@@ -1,5 +1,3 @@
-from pymongo import MongoClient
-
 from dggs.boundary import Boundary
 from dggs.boundary_ID import BoundaryID
 from dggs.boundary_dataset import BoundaryDataSet
@@ -127,6 +125,59 @@ def test_query_by_boundary_in_boundary_datasets():
     assert num_boundaries == 1
     store.dropAll()
 
+def test_update_boundary_dataset():
+    store.dropAll()
+    bds = BoundaryDataSet("id")
+    boundaries = ['O23P12P34S56', 'P10P11P2', 'N0', 'N8O2P0', 'O6S0S1S2', 'Q']
+
+    for boundary in boundaries:
+        bds.add(Boundary(boundary_ID=BoundaryID(boundary)), Data(""))
+    store.insert(bds)
+
+    bds2 = BoundaryDataSet("id")
+    boundaries2 = ['N0', 'N8O2P0', 'O6S0S1S2', 'Q']
+
+    for boundary in boundaries2:
+        bds2.add(Boundary(boundary_ID=BoundaryID(boundary)), Data(""))
+    store.update_boundary_dataset(bds2)
+
+    stored_bds = store.all_boundaries_in_dataset("id")
+    num_bds = 0
+    num_boundaries = 0
+    for bds in stored_bds:
+        for boundary in bds.get_boundaries():
+            assert boundaries2.__contains__(boundary.AUID_to_ID())
+            num_boundaries = num_boundaries + 1
+        num_bds = num_bds + 1
+    assert num_bds == 1
+    assert num_boundaries == len(boundaries2)
+    store.dropAll()
+
+
+def test_update_cell_in_cell_datasets():
+    store.dropAll()
+    bds = BoundaryDataSet("id")
+    boundaries = ['O23P12P34S56', 'P10P11P2', 'N0', 'N8O2P0', 'O6S0S1S2', 'Q']
+
+    for boundary in boundaries:
+        bds.add(Boundary(boundary_ID=BoundaryID(boundary)), Data(""))
+    store.insert(bds)
+
+    store.update_boundary_in_boundary_datasets("id", (Boundary(boundary_ID=BoundaryID('O23P12P34S56'))), Data("test"))
+
+    stored_bds = store.query_by_boundary_in_boundary_datasets("id", (Boundary(boundary_ID=BoundaryID('O23P12P34S56'))))
+    num_bds = 0
+    num_boundaries = 0
+    for bds in stored_bds:
+        for boundary, data in bds.get_boundaries_and_data():
+            assert boundaries.__contains__(boundary.AUID_to_ID())
+            assert data.content == Data("test").content
+            num_boundaries = num_boundaries + 1
+        num_bds = num_bds + 1
+    assert num_bds == 1
+    assert num_boundaries == 1
+    store.dropAll()
+
 
 def test_delete_boundary_dataset():
     store.dropAll()
@@ -179,6 +230,8 @@ if __name__ == "__main__":
     test_all_boundary_dataset()
     test_all_boundaries_in_dataset()
     test_query_by_boundary_in_boundary_datasets()
+    test_update_boundary_dataset()
+    test_update_cell_in_cell_datasets()
     test_delete_boundary_dataset()
     test_delete_boundary_in_boundary_datasets()
     #test_query_by_polygon()

@@ -176,9 +176,9 @@ def test_to_JSON():
         boundary3.boundary_ID.value: (boundary3, data)
     }
     b_dataset = BoundaryDataSet('id', b_ds)
-    print(b_dataset.toJSON())
+    print(b_dataset.toJSON(True))
 
-    b_dataset_2 = BoundaryDataSet('').fromJSON(b_dataset.toJSON())
+    b_dataset_2 = BoundaryDataSet('').fromJSON(b_dataset.toJSON(True))
     b_dataset_2.print()
 
 

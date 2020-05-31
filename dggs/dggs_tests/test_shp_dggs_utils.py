@@ -38,7 +38,7 @@ class TestsShpDGGS:
         self.dggs_utils.shp_file_from_boundary(self.boundary, self.output_file, False)
 
     def test_shp_files_from_boundary_dataset(self):
-        self.dggs_utils.shp_files_from_boundary_dataset(self.b_dataset, False, self.output_file)
+        self.dggs_utils.shp_files_from_boundary_dataset(self.b_dataset,self.output_file, False)
 
     def test_shp_get_cells_from_shp_file(self, file):
         cells, data = self.shp_utils.get_cells_from_shp_file(file, True)

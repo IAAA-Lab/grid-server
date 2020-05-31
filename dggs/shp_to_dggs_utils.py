@@ -137,8 +137,9 @@ class ShpDGGSUtils:
         bds = self.get_boundary_dataset_from_shp_file(dir, id, with_ids, refinement=refinement)
         bds_json = bds.toJSON(optimal)
         if output_file:
-            output_file.write(bds_json)
-            print("Saved")
+            with open(output_file, 'a') as json_file:
+                json_file.write(bds_json)
+                print("Saved")
         else:
             print(bds_json)
 
@@ -161,8 +162,9 @@ class ShpDGGSUtils:
         boundary_json = json.dumps(boundary)
 
         if output_file:
-            output_file.write(boundary_json)
-            print("Saved")
+            with open(output_file, 'a') as json_file:
+                json_file.write(boundary_json)
+                print("Saved")
         else:
             print(boundary_json)
 
@@ -194,9 +196,9 @@ if __name__ == "__main__":
     for current_argument, current_value in arguments:
         if current_argument in ("-f", "--file"):
             file = current_value
-        if current_argument in ("-d", "--dir"):
+        elif current_argument in ("-d", "--dir"):
             dir = current_value
-        if current_argument in ("--id"):
+        elif current_argument in ("--id"):
             bds_id = current_value
         elif current_argument in ("-r", "--refinement"):
             refinement = current_value
@@ -204,7 +206,7 @@ if __name__ == "__main__":
             with_ids = True
         elif current_argument in ("-s", "--save"):
             save = True
-            output_file = open(current_value, "a")
+            output_file = current_value
         elif current_argument in ("-o", "--optimal"):
             optimal = True
         elif current_argument in ("-h", "--help"):
@@ -215,7 +217,7 @@ if __name__ == "__main__":
             print(
                 "--with_ids -> if in the shapefile there is an id property that indicates the identifier of the cells")
             print("-r | --refinement= -> level of refinement if cell identifiers are to be calculated")
-            print("-s | --save= -> if you want to save in a file, the output file")
+            print("-s | --save= -> if you want to save in a file, the output file (.json)")
             print("-o | --optimal= -> include AUID (Optimal Boundary)")
 
     if (file == '' and dir == '') or (file != '' and dir != ''):
@@ -240,5 +242,3 @@ if __name__ == "__main__":
         else:
             shp_utils.get_boundary_dataset_from_shp_file_cli(dir, bds_id, with_ids, refinement=refinement,
                                                              output_file=output_file, optimal=optimal)
-    if save:
-        output_file.close()

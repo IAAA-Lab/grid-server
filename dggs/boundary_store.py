@@ -185,7 +185,7 @@ class BoundaryStore:
         """
         :param id: identifier of the BoundaryDataset
         :param boundary: Boundary or OptimalBoundary. If it is not optimal, it is optimized before making the query.
-        :return: Boundaries and data associated stored in the BoundaryDataset with that id.
+        :return: Boundary and data associated stored in the BoundaryDataset with that id.
         """
         if boundary.is_optimal():
             optimal_boundary = boundary
@@ -226,13 +226,18 @@ class BoundaryStore:
 
     def update_boundary_in_boundary_datasets(self, bds_id, boundary, data):
         """
-        :param id: identifier of the BoundaryDataset
+        :param bds_id: identifier of the BoundaryDataset
         :param boundary: Boundary or OptimalBoundary. If it is not optimal, it is optimized before making the query.
         :return: Update the stored boundary that have the same identifier as the param in the BoundaryDataset with that id.
         """
+        if boundary.is_optimal():
+            optimal_boundary = boundary
+        else:
+            optimal_boundary = boundary.optimize()
+
         boundaries_datasets_founded = self.db.b_data_sets.find({"_id": bds_id})
         for boundary_dataset in boundaries_datasets_founded:
-            myquery = {"auid": boundary.boundary_ID.value, "boundary_dataset_id": boundary_dataset["_id"],}
+            myquery = {"auid": optimal_boundary.boundary_ID.value, "boundary_dataset_id": boundary_dataset["_id"],}
             newvalues = {"$set": {"data": data.content}}
 
             return self.db.boundaries.update_many(myquery, newvalues)

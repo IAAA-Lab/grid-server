@@ -1,4 +1,4 @@
-### API Resources
+### API Resources (Boundary Dataset)
   - [GET /bdatasets](#get-boundaries_datasets)
   - [POST /bdatasets](#post-boundaries_dataset)
   - [GET /bdatasets/[bdatasets_id]](#get-boundaries_dataset)
@@ -10,6 +10,21 @@
   - [GET /boundaries](#get-boundaries)
   - [GET /boundaries/[boundary_id]](#get-boundaries)
   - [DELETE /boundaries/[boundary_id]](#delete-boundaries)
+  
+### API Resources (Cell Dataset)
+  - [GET /cdatasets](#get-cells_datasets)
+  - [POST /cdatasets](#post-cells_dataset)
+  - [GET /cdatasets/[cdatasets_id]](#get-cells_dataset)
+  - [GET /cdatasets/[cdatasets_id]/[cell_id]](#get-cell-in-cells_dataset)  
+  - [PUT /cdatasets/[cdatasets_id]](#put-cells_dataset)
+  - [PUT /cdatasets/[cdatasets_id]/[cell_id]](#put-cell-in-cells_dataset)  
+  - [DELETE /cdatasets/[cdatasets_id]](#delete-cells_dataset)
+  - [DELETE /cdatasets/[cdatasets_id]/[cell_id]](#delete-cell-in-cells_dataset)  
+  - [GET /cells](#get-cells)
+  - [GET /cells/[cell_id]](#get-cells)
+  - [DELETE /cells/[cell_id]](#delete-cells)
+
+  
 
 ### GET /bdatasets
 
@@ -200,11 +215,9 @@ Example: PUT  http://example.com/bdatasets/id_1/P10P11P2
 
 Request body:
 
-    {
-          {
-              "data": "test2"
-          }
-     }
+      {
+          "data": "test2"
+      }
 
 ### DELETE /bdatasets/[bdatasets_id]
 
@@ -343,3 +356,287 @@ with that id along with the Data associated to it.
 |  boundary_id | Path  | Boundary identifier (Cell identifier sequence)
 
 Example: DELETE  http://example.com/boundaries/P1P2P3
+
+
+### GET /cdatasets
+
+Returns all CellDatasets stored
+
+Example: GET  http://example.com/cdatasets
+
+Response body:
+
+    [
+      {
+          "id": "id_1",
+          "cell_data_set": [
+              {
+                  "cellID": "P0",
+                  "data": "test"
+              },
+              {
+                  "cellID": "P1",
+                  "data": "test"
+              },
+              {
+                  "cellID": "P2",
+                  "data": "test"
+              }
+          ]
+      },
+      {
+          "id": "id_2",
+          "cell_data_set": [
+              {
+                  "cellID": "S0",
+                  "data": "test"
+              },
+              {
+                  "cellID": "S1",
+                  "data": "test"
+              },
+          ]
+      },
+    ]
+
+### POST /cdatasets
+
+Insert a CellDataset
+
+Example: POST  http://example.com/cdatasets
+
+Request body:
+
+    {
+          "id": "id_1",
+          "cell_data_set": [
+              {
+                  "cellID": "P0",
+                  "data": "test"
+              },
+              {
+                  "cellID": "P1",
+                  "data": "test"
+              },
+              {
+                  "cellID": "P2",
+                  "data": "test"
+              }
+          ]
+      },
+
+
+
+### GET /cdatasets/[cdatasets_id]
+
+Returns the cellDataset with that id.
+
+#### Parameters
+
+| Parameter | Parameter Type | Description |
+| ------------- | ------------- | ------------- |
+|  cdatasets_id | Path  | CellDataset identifier
+
+Example: GET  http://example.com/cdatasets/id_1
+
+Response body:
+
+    [
+      {
+          "id": "id_1",
+          "cell_data_set": [
+              {
+                  "cellID": "P0",
+                  "data": "test"
+              },
+              {
+                  "cellID": "P1",
+                  "data": "test"
+              },
+              {
+                  "cellID": "P2",
+                  "data": "test"
+              }
+          ]
+      }
+    ]
+
+
+### GET /cdatasets/[cdatasets_id]/[cell_id]
+
+Returns the cell with that id along with the Data associated to it, in the cellDataset
+with that id.
+
+#### Parameters
+
+| Parameter | Parameter Type | Description |
+| ------------- | ------------- | ------------- |
+|  cdatasets_id | Path  | CellDataset identifier
+|  cell_id | Path  | cell identifier (Cell identifier sequence)
+
+Example: GET  http://example.com/cdatasets/id_1/P0
+
+Response body:
+
+    [
+      {
+          "id": "id_1",
+          "cell_data_set": [
+              {
+                  "cellID": "P0",
+                  "data": "test"
+              }
+          ]
+      },
+    ]
+    
+### PUT /cdatasets/[cdatasets_id]
+
+Update the cellDataset with that id.
+
+#### Parameters
+
+| Parameter | Parameter Type | Description |
+| ------------- | ------------- | ------------- |
+|  cdatasets_id | Path  | CellDataset identifier
+
+Example: PUT  http://example.com/cdatasets/id_1
+
+Request body:
+
+    {
+          "cell_data_set": [
+              {
+                  "cellID": "Q0",
+                  "data": "test"
+              },
+              {
+                  "cellID": "Q1",
+                  "data": "test"
+              },
+              {
+                  "cellID": "Q2",
+                  "data": "test"
+              }
+          ]
+      }
+
+
+
+### PUT /cdatasets/[cdatasets_id]/[cell_id]
+
+Update the cell with that id, in the CellDataset with that id.
+
+#### Parameters
+
+| Parameter | Parameter Type | Description |
+| ------------- | ------------- | ------------- |
+|  cdatasets_id | Path  | CellDataset identifier
+|  cell_id | Path  | Cell identifier (Cell identifier sequence)
+
+Example: PUT  http://example.com/cdatasets/id_1/P0
+
+Request body:
+
+    {
+          {
+              "data": "test2"
+          }
+     }
+
+### DELETE /cdatasets/[cdatasets_id]
+
+Deletes the CellDataset with that id.
+
+#### Parameters
+
+| Parameter | Parameter Type | Description |
+| ------------- | ------------- | ------------- |
+|  cdatasets_id | Path  | cellDataset identifier
+
+Example: DELETE  http://example.com/cdatasets/id_1
+
+
+### DELETE /cdatasets/[cdatasets_id]/[cell_id]
+
+Deletes the cell with that id along with the Data associated to it, in the CellDataset
+with that id.
+
+#### Parameters
+
+| Parameter | Parameter Type | Description |
+| ------------- | ------------- | ------------- |
+|  cdatasets_id | Path  | CellDataset identifier
+|  cell_id | Path  | cell identifier (Cell identifier sequence)
+
+Example: DELETE  http://example.com/cdatasets/id_1/P0
+
+
+### GET /cells
+
+Returns all cells along with the Data associated to them.
+
+Example: GET  http://example.com/cells
+
+Response body:
+
+    [
+        {
+              "cellID": "P0",
+              "data": "test"
+          },
+          {
+              "cellID": "P1",
+              "data": "test"
+          },
+          {
+              "cellID": "P2",
+              "data": "test"
+          },
+          {
+              "cellID": "S0",
+              "data": "test"
+          },
+          {
+              "cellID": "S1",
+              "data": "test"
+          },
+
+    ]
+   
+    
+### GET /cells/[cell_id]
+
+Returns the cell (or cells if it exists in different CellDatasets) 
+with that id along with the Data associated to it.
+
+#### Parameters
+
+| Parameter | Parameter Type | Description |
+| ------------- | ------------- | ------------- |
+|  cell_id | Path  | cell identifier (Cell identifier sequence)
+
+Example: GET  http://example.com/cells/P0
+
+Response body:
+
+    [
+        {
+              "cellID": "P0",
+              "data": "test"
+         },
+    ]
+
+
+### DELETE /cells/[cell_id]
+
+Deletes the cell (or cells if it exists in different CellDatasets) 
+with that id along with the Data associated to it.
+
+#### Parameters
+
+| Parameter | Parameter Type | Description |
+| ------------- | ------------- | ------------- |
+|  cell_id | Path  | cell identifier (Cell identifier sequence)
+
+Example: DELETE  http://example.com/cells/P0

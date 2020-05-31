@@ -44,7 +44,7 @@ class Boundary:
             cell_ids = sorted([cell.value for cell in cells])
             self.cells = [CellID(id) for id in cell_ids]
             boundary_ID = ''
-            for cell_ID in cells:
+            for cell_ID in self.cells:
                 boundary_ID = boundary_ID + cell_ID.value
             self.boundary_ID = BoundaryID(boundary_ID)
 
@@ -201,7 +201,7 @@ class Boundary:
             bounds = [ul, dr]
             bbox_bounds = [[bounds[0][0], bounds[0][1]], [bounds[1][0], bounds[0][1]],
                            [bounds[0][0], bounds[1][1]], [bounds[1][0], bounds[1][1]]]
-            print(bbox_bounds)
+
             if self.dggs.check_bounds(bbox_bounds):
                 bbox_bounds = self.dggs.get_geodetic_coordinates_from_bbox(bbox_bounds)
             else:

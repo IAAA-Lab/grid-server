@@ -5,8 +5,13 @@ from rest_framework.exceptions import ValidationError
 from dggs.boundary import Boundary
 from dggs.boundary_ID import BoundaryID
 from dggs.boundary_dataset import BoundaryDataSet
+from dggs.cell_ID import CellID
+from dggs.cell_dataset import CellDataSet
 from dggs.data import Data
 
+"""
+BOUNDARY_DATASET
+"""
 
 class BoundaryDatasetField(serializers.Field):
     def to_representation(self, boundary_data_set):
@@ -37,12 +42,13 @@ class BoundaryDatasetSerializer(serializers.Serializer):
         bds = BoundaryDataSet(id=self.validated_data['id'], boundary_data_set=self.validated_data['boundary_data_set'])
         store.insert(bds)
 
+
 class BoundaryDatasetUpdateSerializer(serializers.Serializer):
     boundary_data_set = BoundaryDatasetField()
 
     def save(self, store, bds_id):
-            bds = BoundaryDataSet(id=bds_id, boundary_data_set=self.validated_data['boundary_data_set'])
-            store.update_boundary_dataset(bds)
+        bds = BoundaryDataSet(id=bds_id, boundary_data_set=self.validated_data['boundary_data_set'])
+        store.update_boundary_dataset(bds)
 
 
 class BoundaryDataSerializer(serializers.Serializer):
@@ -67,9 +73,69 @@ class DataField(serializers.Field):
     def to_internal_value(self, data):
         return data
 
+
 class BoundaryDataUpdateSerializer(serializers.Serializer):
     data = DataField()
 
     def save(self, store, bds_id, boundary_id):
         store.update_boundary_in_boundary_datasets(bds_id, Boundary(boundary_ID=BoundaryID(boundary_id)).optimize(),
                                                    Data(self.validated_data['data']))
+
+
+"""
+CELL_DATASET
+"""
+
+class CellDatasetField(serializers.Field):
+    def to_representation(self, cell_data_set):
+        cds_representation = []
+        for id, (cell_id, data) in cell_data_set.items():
+            dic = {
+                'cellID': id,
+                'data': data.content
+            }
+            cds_representation.append(dic)
+        return cds_representation
+
+    def to_internal_value(self, data):
+        cds = CellDataSet(id='')
+        for item in data:
+            if not re.match(r'^[A-Za-z0-9]+$', item['cellID']):
+                raise ValidationError('Incorrect format: ' + item['cellID'])
+            cds.add(CellID(item['cellID']), Data(item['data']))
+        return cds.cell_data_set
+
+
+class CellDatasetSerializer(serializers.Serializer):
+    id = serializers.CharField(max_length=200)
+    cell_data_set = CellDatasetField()
+
+    def save(self, store):
+        cds = CellDataSet(id=self.validated_data['id'], cell_data_set=self.validated_data['cell_data_set'])
+        store.insert(cds)
+
+
+class CellDatasetUpdateSerializer(serializers.Serializer):
+    cell_data_set = CellDatasetField()
+
+    def save(self, store, cds_id):
+        cds = CellDataSet(id=cds_id, cell_data_set=self.validated_data['cell_data_set'])
+        store.update_cell_dataset(cds)
+
+
+class CellDataSerializer(serializers.Serializer):
+    cellID = serializers.SerializerMethodField()
+    data = serializers.SerializerMethodField()
+
+    def get_cellID(self, obj):
+        return obj[0].value
+
+    def get_data(self, obj):
+        return obj[1].content
+
+
+class CellDataUpdateSerializer(serializers.Serializer):
+    data = DataField()
+
+    def save(self, store, cds_id, cellID):
+        store.update_cell_in_cell_datasets(cds_id, CellID(cellID), Data(self.validated_data['data']))

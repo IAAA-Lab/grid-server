@@ -15,11 +15,16 @@ Including another URLconf
 """
 from rest_framework import routers
 
-from api_dggs.api.views import BoundaryDatasetsView, BoundaryView
+from api_dggs.api.views import BoundaryDatasetsView, BoundaryView, CellDatasetsView, CellView
 
 router = routers.DefaultRouter()
 
 router.register(r'bdatasets', BoundaryDatasetsView, basename='bdatasets')
 router.register(r'bdatasets/(?P<bds>\w+)', BoundaryDatasetsView, basename='bdatasets')
 router.register(r'boundaries', BoundaryView, basename='boundaries')
+
+router.register(r'cdatasets', CellDatasetsView, basename='cdatasets')
+router.register(r'cdatasets/(?P<cds>\w+)', CellDatasetsView, basename='cdatasets')
+router.register(r'cells', CellView, basename='cells')
+
 urlpatterns = router.urls

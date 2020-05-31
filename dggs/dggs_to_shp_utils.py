@@ -120,7 +120,7 @@ class DGGSShpUtils:
         else:
             self.write_shapefile(cell_list, out_shp, data=False)
 
-    def shp_files_from_boundary_dataset(self, boundary_dataset, bbox, out_shp):
+    def shp_files_from_boundary_dataset(self, boundary_dataset, out_shp, bbox):
         index = 0
         for (boundary, data) in boundary_dataset.get_boundaries_and_data():
             cell_list = []
