@@ -10,9 +10,6 @@ from dggs.rHealPix import rHEALPix
 
 
 class ShpDGGSUtils:
-    """
-
-    """
 
     def __init__(self, dggs=None):
         if dggs is None:

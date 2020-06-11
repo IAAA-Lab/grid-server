@@ -497,39 +497,3 @@ class rHEALPix():
         for i in range(refinement):
             cell = cell + str(self.rowcol_cells[(int(row_id[i]), int(col_id[i]))])
         return CellID(cell)
-
-# a = int(math.ceil(
-#             math.log( 6374581.4671 ** 2 * (2 * pi / 3) * 1 ** -1) / (2 * math.log(3))))
-# b = 6374581.4671 * (pi / 2) * 3 ** (-15)
-# c = 0.998882147091 * (pi / 2) * 3 ** (-15)
-# print(a)
-# print(b)
-# print(c)
-
-
-# from math import cos, sin, asin, sqrt, radians, degrees
-#
-# def calc_distance(lat1, lon1, lat2, lon2):
-#     """
-#     Calculate the great circle distance between two points
-#     on the earth (specified in decimal degrees)
-#     """
-#     # convert decimal degrees to radians
-#     lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
-#     # haversine formula
-#     dlon = lon2 - lon1
-#     dlat = lat2 - lat1
-#     a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
-#     c = 2 * asin(sqrt(a))
-#     m = 6374581.4671 * c
-#     return m
-#
-# m = calc_distance(41.8583333, -1.2139773, 41.8583333, -0.5469303)
-# print(m)
-# print(m/131)
-#
-# refinement_level = int(math.ceil(
-#             math.log( 6374581.4671 ** 2 * (2 * pi / 3) * ((m/131) ** 2) ** -1) / (2 * math.log(3))))
-# print(refinement_level)
-# cell_width = 6374581.4671 * (pi / 2) * 3 ** (-refinement_level)
-# print(cell_width)

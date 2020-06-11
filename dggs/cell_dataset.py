@@ -94,10 +94,7 @@ class CellDataSet:
         """
         :return: list with all the cells of the set
         """
-        cell_list = []
-        for id, (cell_id, data) in self.cell_data_set.items():
-            cell_list.append(cell_id)
-        return cell_list
+        return self.cells
 
     def get_cells_and_data(self):
         """
@@ -154,6 +151,99 @@ class CellDataSet:
         for id, (cell_id, data) in self.cell_data_set.items():
             print(cell_id.value, data.content)
 
+    def get_geodetic_coordinates(self):
+        """
+        :return: list of geodetic coordinates of the vertices of each cell of the celldataset
+        (upper left, upper right, lower left, lower right, nucleus)
+        """
+        gC = []
+        for cell in self.cells:
+            gC.append(self.dggs.get_cell_geodetic_coordinates(cell))
+        return gC
+
+    def get_limit_cells(self):
+        """
+        :return: Top cell, bottom cell, leftmost cell, and rightmost cell
+        """
+        top_cell = self.cells[0]
+        bottom_cell = self.cells[0]
+        for cell in self.cells:
+            if self.dggs.up(cell, top_cell):
+                top_cell = cell
+            if self.dggs.down(cell, bottom_cell):
+                bottom_cell = cell
+
+        left_cell = self.cells[0]
+        right_cell = self.cells[0]
+        for cell in self.cells:
+            if self.dggs.left(cell, left_cell):
+                left_cell = cell
+            if self.dggs.right(cell, right_cell):
+                right_cell = cell
+
+        return top_cell, bottom_cell, left_cell, right_cell
+
+    def get_bbox(self, projected=False):
+        """
+        :return: geodetic coordinates of the bbox of the cell dataset
+        [lower left, lower right, upper right, upper left, lower left]
+
+        """
+        if len(self.cells) == 1:
+            ul = self.dggs.get_cell_projected_coordinates(self.cells[0])[0]
+            dr = self.dggs.get_cell_projected_coordinates(self.cells[0])[3]
+            bounds = [ul, dr]
+            bbox_bounds = self.dggs.get_geodetic_coordinates_from_bbox(
+                [[bounds[0][0], bounds[0][1]], [bounds[1][0], bounds[0][1]],
+                 [bounds[0][0], bounds[1][1]], [bounds[1][0], bounds[1][1]]])
+        else:
+            top_cell, below_cell, left_cell, right_cell = self.get_limit_cells()
+
+            if top_cell == left_cell:
+                ul = self.dggs.get_cell_projected_coordinates(top_cell)[0]
+            else:
+                ul = (self.dggs.get_cell_projected_coordinates(left_cell)[0][0],
+                      self.dggs.get_cell_projected_coordinates(top_cell)[0][1])
+
+            if below_cell == right_cell:
+                dr = self.dggs.get_cell_projected_coordinates(below_cell)[3]
+            else:
+                dr = (self.dggs.get_cell_projected_coordinates(right_cell)[3][0],
+                      self.dggs.get_cell_projected_coordinates(below_cell)[3][1])
+
+            bounds = [ul, dr]
+            bbox_bounds = [[bounds[0][0], bounds[0][1]], [bounds[1][0], bounds[0][1]],
+                           [bounds[0][0], bounds[1][1]], [bounds[1][0], bounds[1][1]]]
+            if not projected:
+                if self.dggs.check_bounds(bbox_bounds):
+                    bbox_bounds = self.dggs.get_geodetic_coordinates_from_bbox(bbox_bounds)
+                else:
+                    up = -90
+                    left = 180
+                    down = 90
+                    right = -180
+                    for cell in [top_cell, left_cell, below_cell, right_cell]:
+                        cell_coords = self.dggs.get_cell_geodetic_coordinates(cell)
+                        for coord in cell_coords:
+                            if coord[1] > up:
+                                up = coord[1]
+                            if coord[0] < left:
+                                left = coord[0]
+                            if coord[1] < down:
+                                down = coord[1]
+                            if coord[0] > right:
+                                right = coord[0]
+
+                    ul = (left, up)
+                    dr = (right, down)
+                    bounds = [ul, dr]
+                    bbox_bounds = [[bounds[0][0], bounds[0][1]], [bounds[1][0], bounds[0][1]],
+                                   [bounds[0][0], bounds[1][1]], [bounds[1][0], bounds[1][1]]]
+
+        return [[bbox_bounds[2], bbox_bounds[3],
+                 bbox_bounds[1], bbox_bounds[0],
+                 bbox_bounds[2]]]
+
     def toJSON(self):
         cell_list = []
         for id, (cell_id, data) in self.cell_data_set.items():
@@ -167,11 +257,11 @@ class CellDataSet:
             'id': self.id,
             'cell_data_set': cell_list,
         }
-        print(cds)
         return json.dumps(cds)
 
-    def fromJSON(self, cds_json):
-        cds = json.loads(cds_json)
+    def fromJSON(self, cds, file=False):
+        if file:
+            cds = json.load(cds)
         self.cell_data_set = {}
         self.id = cds['id']
         cell_list = cds['cell_data_set']

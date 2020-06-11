@@ -138,8 +138,9 @@ class BoundaryDataSet:
         }
         return json.dumps(bds)
 
-    def fromJSON(self, bds_json):
-        bds = json.loads(bds_json)
+    def fromJSON(self, bds, file=False):
+        if file:
+            bds = json.load(bds)
         self.boundary_data_set = {}
         self.id = bds['id']
         boundary_list = bds['boundary_data_set']

@@ -1,4 +1,4 @@
-import gdal
+
 import rasterio
 from numpy import pi
 from math import radians, cos, sin, asin, sqrt
@@ -6,12 +6,10 @@ from math import radians, cos, sin, asin, sqrt
 from dggs.cell_dataset import CellDataSet
 from dggs.data import Data
 from dggs.rHealPix import rHEALPix
+import os
 
 
 class TifDGGSUtils:
-    """
-
-    """
 
     def __init__(self, dggs=None):
         if dggs is None:
@@ -20,12 +18,10 @@ class TifDGGSUtils:
 
     def tif_file_treatment(self, file):
         dataset = rasterio.open(file)
-        band = dataset.read(1)
-        print(band)
-
         pix0 = dataset.xy(0, 0)
         pix1 = dataset.xy(0, 1)
 
+        #Obtener longitud del lado de un pixel en metros (ya que rasterio me lo da en grados)
         lon1, lat1, lon2, lat2 = map(radians, [pix0[0], pix0[1], pix1[0], pix1[1]])
         dlon = lon2 - lon1
         dlat = lat2 - lat1
@@ -37,16 +33,33 @@ class TifDGGSUtils:
         refinement = self.dggs.refinement_for_area(side ** 2)
         resolution = (pi/2) / (self.dggs.N_side ** refinement)
 
-        ds = gdal.Warp('output_rhealpix.tif', file, srcSRS='EPSG:4326',
-                       dstSRS='+proj=rhealpix +lon_0=0 +a=1 +ellps=WGS84 +npole=0 +spole=0 +wktext',
-                       xRes=resolution,
-                       yRes=resolution,
-                       creationOptions="COMPRESS=PAC")
+        # ds = gdal.Warp('output_rhealpix.tif', file, srcSRS='EPSG:4326',
+        #                dstSRS='+proj=rhealpix +lon_0=0 +a=1 +ellps=WGS84 +npole=0 +spole=0 +wktext',
+        #                xRes=resolution,
+        #                yRes=resolution,
+        #                creationOptions="COMPRESS=PAC")
 
-        dataset = rasterio.open('output_rhealpix.tif')
-        band = dataset.read(1)
+        warp = 'gdalwarp -s_srs EPSG:4326 -t_srs \'+proj=rhealpix +lon_0=0 +a=1 +ellps=WGS84 +npole=0 +spole=0 +wktext\' -tr ' + str(resolution) \
+               + ' ' + str(resolution) + ' -co \"COMPRESS=PAC\" ' + file + ' rhealpix_aux.tif'
+        os.system(warp)
 
-        return dataset, band, refinement
+        dataset_rhealpix = rasterio.open('rhealpix_aux.tif')
+        band_rhealpix = dataset_rhealpix.read(1)
+
+        # array = dataset_rhealpix.read()
+        # stats = []
+        # for band in array:
+        #     stats.append({
+        #         'min': band.min(),
+        #         'mean': band.mean(),
+        #         'max': band.max()})
+        # print(stats)
+
+        from glob import glob
+        for file in glob('./rhealpix_aux.tif'):
+            os.remove(file)
+
+        return dataset_rhealpix, band_rhealpix, refinement
 
     def get_cell_dataset_from_tif_file(self, file, id):
         cds = CellDataSet(id=id)
@@ -58,6 +71,9 @@ class TifDGGSUtils:
                 cell = self.dggs.get_cell_from_projected_point(refinement, cell_rHealPix_coords)
                 data = Data(int(band[j, i]))
                 cds.add(cell, data)
+            if j == 10:
+                break
+
         return cds
 
     """

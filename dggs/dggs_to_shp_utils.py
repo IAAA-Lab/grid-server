@@ -9,9 +9,6 @@ from dggs.rHealPix import rHEALPix
 
 
 class DGGSShpUtils:
-    """
-
-    """
 
     def __init__(self, dggs=None):
         if dggs is None:
@@ -156,8 +153,7 @@ class DGGSShpUtils:
 
     def shp_files_from_boundary_dataset_cli(self, boundary_dataset_file, out_shp, bbox):
         with open(boundary_dataset_file) as json_file:
-            boundary_dataset_json = json.load(json_file)
-            bds = BoundaryDataSet("").fromJSON(boundary_dataset_json)
+            bds = BoundaryDataSet("").fromJSON(json_file, file=True)
             self.shp_files_from_boundary_dataset(bds, out_shp, bbox)
 
 
