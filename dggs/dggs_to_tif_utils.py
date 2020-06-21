@@ -1,10 +1,9 @@
-import json
 import gdal
 from dggs.cell_dataset import CellDataSet
 from dggs.rHealPix import rHEALPix
 from numpy import pi
 import numpy
-from osgeo import gdal, osr
+from osgeo import gdal
 import os
 
 
@@ -28,9 +27,8 @@ class DGGSTifUtils:
     def orderByCell(self, pair):
         return pair[0].value
 
-    def write_tif(self, raster_data_array, XSize, YSize, resolution, bbox, output_file):
+    def write_tif(self, raster_data_array, XSize, YSize, resolution, raster_resolution, bbox, output_file):
         # Create gtif file
-        ds = gdal.Open('rhealpix_ref.tif')
         driver = gdal.GetDriverByName("GTiff")
 
         r_output_file = 'rhealpix_' + output_file
@@ -43,26 +41,24 @@ class DGGSTifUtils:
         new_array = numpy.array(raster_data_array)
 
         dst_ds.GetRasterBand(1).WriteArray(new_array)
-        dst_ds.GetRasterBand(1).SetNoDataValue(-999)
+        dst_ds.GetRasterBand(1).SetNoDataValue(255)
         # setting extension of output raster
         # top left x, w-e pixel resolution, rotation, top left y, rotation, n-s pixel resolution
-        dst_ds.SetGeoTransform((bbox[0][3][0], resolution, 0.0, bbox[0][3][1], 0.0, resolution))
+        dst_ds.SetGeoTransform((bbox[0][3][0], resolution, 0.0, bbox[0][3][1], 0.0, -resolution))
 
         # setting spatial reference of output raster
-        wkt = ds.GetProjection()
-        srs = osr.SpatialReference()
-        srs.ImportFromWkt(wkt)
-        dst_ds.SetProjection(srs.ExportToWkt())
+        srs = 'PROJCS["unnamed",GEOGCS["WGS 84",DATUM["unknown",SPHEROID["WGS84",6378137,298.257223563]],' \
+              'PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433]],PROJECTION["custom_proj4"],' \
+              'EXTENSION["PROJ4","+proj=rhealpix +lon_0=0 +a=1 +ellps=WGS84 +npole=0 +spole=0 +wktext"]]'
+
+        dst_ds.SetProjection(srs)
 
         # Close output raster dataset
-        ds = None
         dst_ds = None
 
-        # top left x, w-e pixel resolution, rotation, top left y, rotation, n-s pixel resolution
-        # (-0.021164216023444753, 2.660157372343133e-05, 0.0, 0.7833026969369082, 0.0, -2.660157372343133e-05)
-
         warp = 'gdalwarp  -t_srs EPSG:4326 -s_srs \'+proj=rhealpix +lon_0=0 +a=1 +ellps=WGS84 +npole=0 +spole=0 ' \
-               '+wktext\' ' + ' -co \"COMPRESS=PAC\" ' + r_output_file + ' ' + output_file
+               '+wktext\' -tr ' + str(raster_resolution) \
+               + ' ' + str(raster_resolution) + ' -co \"COMPRESS=PAC\" ' + r_output_file + ' ' + output_file
         os.system(warp)
 
     def tif_file_from_cell_dataset(self, cell_dataset, out_tif):
@@ -98,10 +94,15 @@ class DGGSTifUtils:
             raster_data_array.append(data_row)
             YSize = YSize + 1
 
+        geodetic_coordinates = self.dggs.get_cell_geodetic_coordinates(raster_array[0][0][0])
+        ul = geodetic_coordinates[0]
+        ur = geodetic_coordinates[1]
+        raster_res = abs(ur[0] - ul[0])
+
         resolution = (pi / 2) / (self.dggs.N_side ** cell_dataset.get_max_refinement())
         bbox = cell_dataset.get_bbox(projected=True)
 
-        self.write_tif(raster_data_array, XSize, YSize, resolution, bbox, out_tif)
+        self.write_tif(raster_data_array, XSize, YSize, resolution, raster_res, bbox, out_tif)
 
     def tif_file_from_cell_dataset_cli(self, cell_dataset_file, out_tif):
         with open(cell_dataset_file) as json_file:

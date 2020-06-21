@@ -33,7 +33,7 @@ class TifDGGSUtils:
         refinement = self.dggs.refinement_for_area(side ** 2)
         resolution = (pi/2) / (self.dggs.N_side ** refinement)
 
-        # ds = gdal.Warp('output_rhealpix.tif', file, srcSRS='EPSG:4326',
+        # ds = gdal.Warp('rhealpix_aux.tif', file, srcSRS='EPSG:4326',
         #                dstSRS='+proj=rhealpix +lon_0=0 +a=1 +ellps=WGS84 +npole=0 +spole=0 +wktext',
         #                xRes=resolution,
         #                yRes=resolution,
