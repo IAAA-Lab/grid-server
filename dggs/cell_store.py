@@ -37,6 +37,7 @@ class CellStore:
         # Store cellDataSet
         _cellDataSet = {
             "_id": c_dataset.id,
+            "insertID": ObjectId(),
         }
         self.db.c_data_sets.insert_one(_cellDataSet)
 
@@ -208,6 +209,29 @@ class CellStore:
                                                                 "cellID": cell_id.value})
 
         return result.deleted_count
+
+
+    def cell_datasets_ids(self):
+        """
+        :return: List of all identifiers of stored datasets.
+        """
+        cell_datasets_founded = self.db.c_data_sets.find()
+        id_list = []
+        for cds in cell_datasets_founded:
+            id_list.append({'id': cds['_id']})
+
+        return id_list
+
+    def cell_datasets_last_id(self):
+        """
+        :return: Identifier of the last stored dataset.
+        """
+        cell_datasets_founded = self.db.c_data_sets.find().sort("insertID", -1).limit(1)
+        last_id = ''
+        for lastID in cell_datasets_founded:
+            last_id = lastID['_id']
+
+        return {'id': last_id}
 
 
     def dropAll(self):

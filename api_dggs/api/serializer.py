@@ -10,6 +10,20 @@ from dggs.cell_dataset import CellDataSet
 from dggs.data import Data
 
 """
+BOUNDARY_DATASET_IDs
+"""
+
+class BoundaryDatasetIDSerializer(serializers.Serializer):
+    id = serializers.CharField(max_length=400)
+
+"""
+CELL_DATASET_IDs
+"""
+
+class CellDatasetIDSerializer(serializers.Serializer):
+    id = serializers.CharField(max_length=400)
+
+"""
 BOUNDARY_DATASET
 """
 
@@ -35,7 +49,7 @@ class BoundaryDatasetField(serializers.Field):
 
 
 class BoundaryDatasetSerializer(serializers.Serializer):
-    id = serializers.CharField(max_length=200)
+    id = serializers.CharField(max_length=400)
     boundary_data_set = BoundaryDatasetField()
 
     def save(self, store):

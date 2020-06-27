@@ -10,6 +10,8 @@
   - [GET /boundaries](#get-boundaries)
   - [GET /boundaries/[boundary_id]](#get-boundaries)
   - [DELETE /boundaries/[boundary_id]](#delete-boundaries)
+  - [GET /idsbdatasets](#get-boundaries_datasets_ids)
+  - [GET /idsbdatasets/last](#get-last-boundaries_datasets_id)
   
 ### API Resources (Cell Dataset)
   - [GET /cdatasets](#get-cells_datasets)
@@ -23,6 +25,8 @@
   - [GET /cells](#get-cells)
   - [GET /cells/[cell_id]](#get-cells)
   - [DELETE /cells/[cell_id]](#delete-cells)
+  - [GET /idscdatasets](#get-cells_datasets_ids)
+  - [GET /idscdatasets/last](#get-last-cells_datasets_id)
 
   
 
@@ -357,6 +361,42 @@ with that id along with the Data associated to it.
 
 Example: DELETE  http://example.com/boundaries/P1P2P3
 
+  
+### GET /idsbdatasets
+
+Returns all BoundaryDatasets identifiers
+
+Example: GET  http://example.com/idsbdatasets
+
+Response body:
+
+    [
+        {
+            "id": "test1",
+        },
+        {
+            "id": "test2",
+        },
+        {
+            "id": "test3",
+        },
+        
+    ]
+
+
+### GET /idsbdatasets/last
+
+Returns the identifier of the last BoundaryDataset stored
+
+Example: GET  http://example.com/idsbdatasets/last
+
+Response body:
+
+    [
+        {
+            "id": "test3",
+        }
+    ]
 
 ### GET /cdatasets
 
@@ -640,3 +680,41 @@ with that id along with the Data associated to it.
 |  cell_id | Path  | cell identifier (Cell identifier sequence)
 
 Example: DELETE  http://example.com/cells/P0
+
+
+
+### GET /idscdatasets
+
+Returns all CellDatasets identifiers
+
+Example: GET  http://example.com/idscdatasets
+
+Response body:
+
+    [
+        {
+            "id": "test1",
+        },
+        {
+            "id": "test2",
+        },
+        {
+            "id": "test3",
+        },
+        
+    ]
+
+
+### GET /idscdatasets/last
+
+Returns the identifier of the last CellDataset stored
+
+Example: GET  http://example.com/idscdatasets/last
+
+Response body:
+
+    [
+        {
+            "id": "test3",
+        }
+    ]

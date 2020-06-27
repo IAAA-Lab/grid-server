@@ -15,7 +15,7 @@ Including another URLconf
 """
 from rest_framework import routers
 
-from api_dggs.api.views import BoundaryDatasetsView, BoundaryView, CellDatasetsView, CellView
+from api_dggs.api.views import BoundaryDatasetsView, BoundaryView, CellDatasetsView, CellView, BoundaryDatasetsIDsView,CellDatasetsIDsView
 
 router = routers.DefaultRouter()
 
@@ -26,5 +26,8 @@ router.register(r'boundaries', BoundaryView, basename='boundaries')
 router.register(r'cdatasets', CellDatasetsView, basename='cdatasets')
 router.register(r'cdatasets/(?P<cds>\w+)', CellDatasetsView, basename='cdatasets')
 router.register(r'cells', CellView, basename='cells')
+
+router.register(r'idsbdatasets', BoundaryDatasetsIDsView, basename='idsbdatasets')
+router.register(r'idscdatasets', CellDatasetsIDsView, basename='idscdatasets')
 
 urlpatterns = router.urls

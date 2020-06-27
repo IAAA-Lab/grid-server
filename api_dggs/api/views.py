@@ -4,12 +4,80 @@ from rest_framework.response import Response
 
 from api_dggs.api.serializer import BoundaryDatasetSerializer, BoundaryDataSerializer,\
     BoundaryDatasetUpdateSerializer, BoundaryDataUpdateSerializer, CellDatasetSerializer, CellDatasetUpdateSerializer, \
-    CellDataUpdateSerializer, CellDataSerializer
+    CellDataUpdateSerializer, CellDataSerializer, BoundaryDatasetIDSerializer, CellDatasetIDSerializer
 from dggs.boundary import Boundary
 from dggs.boundary_ID import BoundaryID
 from dggs.boundary_store import BoundaryStore
 from dggs.cell_ID import CellID
 from dggs.cell_store import CellStore
+
+
+"""
+BOUNDARY_DATASET_IDs
+"""
+
+class BoundaryDatasetsIDsView(viewsets.ViewSet):
+    serializer_class = BoundaryDatasetIDSerializer
+    store = BoundaryStore()
+
+    def list(self, request):
+        try:
+            boundaries_datasets_ids = self.store.boundary_datasets_ids()
+        except:
+            return Response({
+                'status': 'Bad request',
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        serializer = self.serializer_class(
+            instance=boundaries_datasets_ids, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk=None):
+        if pk == 'last':
+            try:
+                boundary_datasets_last_id = self.store.boundary_datasets_last_id()
+            except:
+                return Response({
+                    'status': 'Bad request',
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+            serializer = self.serializer_class(
+                instance=boundary_datasets_last_id)
+            return Response(serializer.data)
+
+"""
+CELL_DATASET_IDs
+"""
+
+class CellDatasetsIDsView(viewsets.ViewSet):
+    serializer_class = CellDatasetIDSerializer
+    store = CellStore()
+
+    def list(self, request):
+        try:
+            cell_datasets_ids = self.store.cell_datasets_ids()
+        except:
+            return Response({
+                'status': 'Bad request',
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        serializer = self.serializer_class(
+            instance=cell_datasets_ids, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk=None):
+        if pk == 'last':
+            try:
+                bcell_datasets_last_id = self.store.cell_datasets_last_id()
+            except:
+                return Response({
+                    'status': 'Bad request',
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+            serializer = self.serializer_class(
+                instance=bcell_datasets_last_id)
+            return Response(serializer.data)
+
 
 """
 BOUNDARY_DATASET

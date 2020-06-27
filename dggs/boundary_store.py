@@ -7,6 +7,7 @@ from dggs.boundary_dataset import BoundaryDataSet
 from dggs.data import Data
 from dggs.rHealPix import rHEALPix
 import mongodb_config
+from bson import ObjectId
 
 class BoundaryStore:
 
@@ -37,6 +38,7 @@ class BoundaryStore:
         # Store boundaryDataSet
         _boundaryDataSet = {
             "_id": b_dataset.id,
+            "insertID": ObjectId(),
         }
         self.db.b_data_sets.insert_one(_boundaryDataSet)
 
@@ -270,6 +272,28 @@ class BoundaryStore:
                                                                 "auid": optimal_boundary.boundary_ID.value})
 
         return result.deleted_count
+
+    def boundary_datasets_ids(self):
+        """
+        :return: List of all identifiers of stored datasets.
+        """
+        boundaries_datasets_founded = self.db.b_data_sets.find()
+        id_list = []
+        for bds in boundaries_datasets_founded:
+            id_list.append({'id': bds['_id']})
+
+        return id_list
+
+    def boundary_datasets_last_id(self):
+        """
+        :return: Identifier of the last stored dataset.
+        """
+        boundaries_datasets_founded = self.db.b_data_sets.find().sort("insertID", -1).limit(1)
+        last_id = ''
+        for lastID in boundaries_datasets_founded:
+            last_id = lastID['_id']
+
+        return {'id': last_id}
 
 
     def dropAll(self):
