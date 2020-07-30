@@ -41,3 +41,8 @@ By default, the application will be accessible at <http://127.0.0.1:8000/>.
 ```python
 python manage.py runserver
 ```
+
+## License
+[European Union Public License v1.2](https://eupl.eu/1.2/en/).
+
+Licensor: [Advanced Information Systems Laboratory](https://www.iaaa.es). Aragon Institute for Engineering Research, Universidad Zaragoza, Spain.
