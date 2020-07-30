@@ -1,8 +1,8 @@
 import json
 
-from dggs.boundary import Boundary, OptimalBoundary
-from dggs.boundary_ID import BoundaryID, AUID
-from dggs.data import Data
+from dggs.cellset.boundary import OptimalBoundary
+from dggs.boundary_ID import AUID
+from dggs.dataset.data import Data
 from dggs.rHealPix import rHEALPix
 
 
@@ -122,12 +122,12 @@ class BoundaryDataSet:
             if optimal:
                 dic = {
                     'AUID': AUID,
-                    'boundary': boundary.AUID_to_ID(),
+                    'boundary': boundary.AUID_to_CUIDs(),
                     'data': data.content
                 }
             else:
                 dic = {
-                    'boundary': boundary.AUID_to_ID(),
+                    'boundary': boundary.AUID_to_CUIDs(),
                     'data': data.content
                 }
             boundary_list.append(dic)

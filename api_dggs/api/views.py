@@ -5,11 +5,11 @@ from rest_framework.response import Response
 from api_dggs.api.serializer import BoundaryDatasetSerializer, BoundaryDataSerializer,\
     BoundaryDatasetUpdateSerializer, BoundaryDataUpdateSerializer, CellDatasetSerializer, CellDatasetUpdateSerializer, \
     CellDataUpdateSerializer, CellDataSerializer, BoundaryDatasetIDSerializer, CellDatasetIDSerializer
-from dggs.boundary import Boundary
+from dggs.cellset.cellset import Boundary
 from dggs.boundary_ID import BoundaryID
-from dggs.boundary_store import BoundaryStore
+from dggs.store.boundary_store import BoundaryStore
 from dggs.cell_ID import CellID
-from dggs.cell_store import CellStore
+from dggs.store.cell_store import CellStore
 
 
 """
@@ -135,7 +135,7 @@ class BoundaryDatasetsView(viewsets.ViewSet):
                 instance=boundary_dataset, many=True)
         else:
             try:
-                boundary_dataset = self.store.all_boundaries_in_dataset(pk)
+                boundary_dataset = self.store.query_by_boundary_dataset_id(pk)
             except:
                 return Response({
                     'status': 'Bad request',
@@ -353,7 +353,7 @@ class CellDatasetsView(viewsets.ViewSet):
                 instance=cell_dataset, many=True)
         else:
             try:
-                cell_dataset = self.store.all_cells_in_dataset(pk)
+                cell_dataset = self.store.query_by_cell_dataset_id(pk)
             except:
                 return Response({
                     'status': 'Bad request',

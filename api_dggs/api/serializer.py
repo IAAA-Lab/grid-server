@@ -2,12 +2,12 @@ import re
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from dggs.boundary import Boundary
+from dggs.cellset.cellset import Boundary
 from dggs.boundary_ID import BoundaryID
-from dggs.boundary_dataset import BoundaryDataSet
+from dggs.dataset.boundary_dataset import BoundaryDataSet
 from dggs.cell_ID import CellID
-from dggs.cell_dataset import CellDataSet
-from dggs.data import Data
+from dggs.dataset.cell_dataset import CellDataSet
+from dggs.dataset.data import Data
 
 """
 BOUNDARY_DATASET_IDs
@@ -33,7 +33,7 @@ class BoundaryDatasetField(serializers.Field):
         for AUID, (boundary, data) in boundary_data_set.items():
             dic = {
                 'AUID': AUID,
-                'boundary': boundary.AUID_to_ID(),
+                'boundary': boundary.AUID_to_CUIDs(),
                 'data': data.content
             }
             bds_representation.append(dic)
@@ -74,7 +74,7 @@ class BoundaryDataSerializer(serializers.Serializer):
         return obj[0].boundary_ID.value
 
     def get_boundary(self, obj):
-        return obj[0].AUID_to_ID()
+        return obj[0].AUID_to_CUIDs()
 
     def get_data(self, obj):
         return obj[1].content

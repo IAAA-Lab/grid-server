@@ -1,9 +1,9 @@
-from dggs.boundary import Boundary
-from dggs.boundary_dataset import BoundaryDataSet
+from dggs.cellset.boundary import Boundary
+from dggs.dataset.boundary_dataset import BoundaryDataSet
 from dggs.cell_ID import CellID
-from dggs.data import Data
-from dggs.dggs_to_shp_utils import DGGSShpUtils
-from dggs.shp_to_dggs_utils import ShpDGGSUtils
+from dggs.dataset.data import Data
+from dggs.dggs_utils.dggs_to_shp_utils import DGGSShpUtils
+from dggs.dggs_utils.shp_to_dggs_utils import ShpDGGSUtils
 
 
 class TestsShpDGGS:

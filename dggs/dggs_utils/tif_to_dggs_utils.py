@@ -3,8 +3,8 @@ import rasterio
 from numpy import pi
 from math import radians, cos, sin, asin, sqrt
 
-from dggs.cell_dataset import CellDataSet
-from dggs.data import Data
+from dggs.dataset.cell_dataset import CellDataSet
+from dggs.dataset.data import Data
 from dggs.rHealPix import rHEALPix
 import os
 

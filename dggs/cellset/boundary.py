@@ -3,7 +3,7 @@ import networkx as nx
 from dggs.boundary_ID import BoundaryID, AUID
 from dggs.cell_ID import CellID
 from dggs.dggs_auids.dggs_auids import cuids_to_bp_auid, bp_auid_to_cuids
-from dggs.grid_stack import GridStack
+from dggs.cellset.cellset import GridStack
 from dggs.rHealPix import rHEALPix
 
 
@@ -17,8 +17,6 @@ class Boundary:
         self.boundary_ID = boundary_ID
         self.cells = cells
         self.optimal = False
-        self.tree = []
-        self.grid_stack = []
         self.dggs = dggs
 
         assert boundary_ID is not None or cells is not None
@@ -61,7 +59,7 @@ class Boundary:
 
     def get_as_grid_stack(self):
         """
-        :return:
+        :return: GridStack,a series of Grids ordered by their level of refinement
         """
         return GridStack(self.boundary_ID)
 
@@ -242,8 +240,6 @@ class OptimalBoundary(Boundary):
         self.boundary_ID = boundary_ID
         self.cells = cells
         self.optimal = True
-        self.tree = []
-        self.grid_stack = []
         self.dggs = dggs
 
         assert boundary_ID is not None or cells is not None
@@ -264,7 +260,7 @@ class OptimalBoundary(Boundary):
         """
         return self
 
-    def AUID_to_ID(self):
+    def AUID_to_CUIDs(self):
         boundary_ID = ''
         for cell_ID in self.cells:
             boundary_ID = boundary_ID + cell_ID.value

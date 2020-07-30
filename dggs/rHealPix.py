@@ -79,7 +79,7 @@ class rHEALPix():
     def cell_width(self, refinement):
         """
         :param refinement: the resolution, minimum 0, of a cell
-        :return: the width of a cell of said refinement.
+        :return:
         """
         assert refinement >= 0
         return self.Ratio * (pi / 2) * self.N_side ** (-refinement)

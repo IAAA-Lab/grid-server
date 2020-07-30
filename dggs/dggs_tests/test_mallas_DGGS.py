@@ -4,9 +4,9 @@ import fiona
 import requests
 from pymongo import MongoClient
 
-from dggs.boundary import Boundary
+from dggs.cellset.boundary import Boundary
 from dggs.boundary_ID import BoundaryID
-from dggs.boundary_store import BoundaryStore
+from dggs.store.boundary_store import BoundaryStore
 
 
 class TestsMallasDGGS:
@@ -33,9 +33,9 @@ class TestsMallasDGGS:
             if i % 10 == 0 and i != 0:
                 bds.append({'boundary': boundary_id, 'data': data})
                 optB = Boundary(boundary_ID=BoundaryID(boundary_id)).optimize()
-                bds_test.append({'AUID': optB.boundary_ID.value, 'boundary': optB.AUID_to_ID(), 'data': data})
+                bds_test.append({'AUID': optB.boundary_ID.value, 'boundary': optB.AUID_to_CUIDs(), 'data': data})
                 test_boundary_id = boundary_id
-                boundary_test = [{'AUID': optB.boundary_ID.value, 'boundary': optB.AUID_to_ID(), 'data': data}]
+                boundary_test = [{'AUID': optB.boundary_ID.value, 'boundary': optB.AUID_to_CUIDs(), 'data': data}]
                 data = {}
                 boundary_id = ''
             boundary_id = boundary_id + polygon['properties']['id']

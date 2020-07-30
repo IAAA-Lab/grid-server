@@ -3,9 +3,9 @@ import json
 import os
 import fiona
 import requests
-from dggs.boundary import Boundary
+from dggs.cellset.boundary import Boundary
 from dggs.boundary_ID import BoundaryID
-from dggs.boundary_store import BoundaryStore
+from dggs.store.boundary_store import BoundaryStore
 
 
 class TestsEmocionesBoundaries:
@@ -51,10 +51,10 @@ class TestsEmocionesBoundaries:
                     data[polygon['properties']['id']] = polygon['properties']
                 bds.append({'boundary': boundary_id, 'data': data})
                 optB = Boundary(boundary_ID=BoundaryID(boundary_id)).optimize()
-                bds_test.append({'AUID': optB.boundary_ID.value, 'boundary': optB.AUID_to_ID(), 'data': data})
-                all_boundaries.append({'AUID': optB.boundary_ID.value, 'boundary': optB.AUID_to_ID(), 'data': data})
+                bds_test.append({'AUID': optB.boundary_ID.value, 'boundary': optB.AUID_to_CUIDs(), 'data': data})
+                all_boundaries.append({'AUID': optB.boundary_ID.value, 'boundary': optB.AUID_to_CUIDs(), 'data': data})
                 test_boundary_id = boundary_id
-                boundary_test = [{'AUID': optB.boundary_ID.value, 'boundary': optB.AUID_to_ID(), 'data': data}]
+                boundary_test = [{'AUID': optB.boundary_ID.value, 'boundary': optB.AUID_to_CUIDs(), 'data': data}]
             boundary_dataset = {"id": "persona" + str(number_person), 'boundary_data_set': bds}
             test_person_number = "persona" + str(number_person)
             boundary_dataset_test = {"id": "persona" + str(number_person), 'boundary_data_set': bds_test}
@@ -297,7 +297,7 @@ class TestsEmocionesBoundaries:
 if __name__ == "__main__":
 
     shp = TestsEmocionesBoundaries(
-        "/Users/javiermartinez/Documents/UNIVERSIDAD/TFG/Datos_emociones_boundaries/MALLA_INTER/")
+        "/Users/javiermartinezfernandez/Documents/UNIVERSIDAD/TFG/TFG/Datos_emociones_boundaries/MALLA_INTER/")
     shp.test_API(1)
     shp.test_API_polygon_P03()
     shp.test_API_polygon_P21()

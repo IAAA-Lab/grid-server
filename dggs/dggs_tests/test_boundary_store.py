@@ -1,8 +1,8 @@
-from dggs.boundary import Boundary
+from dggs.cellset.boundary import Boundary
 from dggs.boundary_ID import BoundaryID
-from dggs.boundary_dataset import BoundaryDataSet
-from dggs.boundary_store import BoundaryStore
-from dggs.data import Data
+from dggs.dataset.boundary_dataset import BoundaryDataSet
+from dggs.store.boundary_store import BoundaryStore
+from dggs.dataset.data import Data
 
 store = BoundaryStore()
 
@@ -19,7 +19,7 @@ def test_insert_and_all_boudnaries():
     stored_boundaries = store.all_boundaries()
     num_boundaries = 0
     for boundary in stored_boundaries:
-        assert boundaries.__contains__(boundary[0].AUID_to_ID())
+        assert boundaries.__contains__(boundary[0].AUID_to_CUIDs())
         num_boundaries = num_boundaries + 1
     assert num_boundaries == len(boundaries)
     store.dropAll()
@@ -37,7 +37,7 @@ def test_query_by_boundary():
     stored_boundaries = store.query_by_boundary((Boundary(boundary_ID=BoundaryID('O23P12P34S56'))))
     num_boundaries = 0
     for boundary in stored_boundaries:
-        assert boundaries.__contains__(boundary[0].AUID_to_ID())
+        assert boundaries.__contains__(boundary[0].AUID_to_CUIDs())
         num_boundaries = num_boundaries + 1
     assert num_boundaries == 1
     store.dropAll()
@@ -74,7 +74,7 @@ def test_all_boundary_dataset():
     num_boundaries = 0
     for bds in stored_bds:
         for boundary in bds.get_boundaries():
-            assert boundaries.__contains__(boundary.AUID_to_ID())
+            assert boundaries.__contains__(boundary.AUID_to_CUIDs())
             num_boundaries = num_boundaries + 1
         num_bds = num_bds + 1
     assert num_bds == 1
@@ -91,12 +91,12 @@ def test_all_boundaries_in_dataset():
         bds.add(Boundary(boundary_ID=BoundaryID(boundary)), Data(""))
     store.insert(bds)
 
-    stored_bds = store.all_boundaries_in_dataset("id")
+    stored_bds = store.query_by_boundary_dataset_id("id")
     num_bds = 0
     num_boundaries = 0
     for bds in stored_bds:
         for boundary in bds.get_boundaries():
-            assert boundaries.__contains__(boundary.AUID_to_ID())
+            assert boundaries.__contains__(boundary.AUID_to_CUIDs())
             num_boundaries = num_boundaries + 1
         num_bds = num_bds + 1
     assert num_bds == 1
@@ -118,7 +118,7 @@ def test_query_by_boundary_in_boundary_datasets():
     num_boundaries = 0
     for bds in stored_bds:
         for boundary in bds.get_boundaries():
-            assert boundaries.__contains__(boundary.AUID_to_ID())
+            assert boundaries.__contains__(boundary.AUID_to_CUIDs())
             num_boundaries = num_boundaries + 1
         num_bds = num_bds + 1
     assert num_bds == 1
@@ -141,12 +141,12 @@ def test_update_boundary_dataset():
         bds2.add(Boundary(boundary_ID=BoundaryID(boundary)), Data(""))
     store.update_boundary_dataset(bds2)
 
-    stored_bds = store.all_boundaries_in_dataset("id")
+    stored_bds = store.query_by_boundary_dataset_id("id")
     num_bds = 0
     num_boundaries = 0
     for bds in stored_bds:
         for boundary in bds.get_boundaries():
-            assert boundaries2.__contains__(boundary.AUID_to_ID())
+            assert boundaries2.__contains__(boundary.AUID_to_CUIDs())
             num_boundaries = num_boundaries + 1
         num_bds = num_bds + 1
     assert num_bds == 1
@@ -170,7 +170,7 @@ def test_update_cell_in_cell_datasets():
     num_boundaries = 0
     for bds in stored_bds:
         for boundary, data in bds.get_boundaries_and_data():
-            assert boundaries.__contains__(boundary.AUID_to_ID())
+            assert boundaries.__contains__(boundary.AUID_to_CUIDs())
             assert data.content == Data("test").content
             num_boundaries = num_boundaries + 1
         num_bds = num_bds + 1
@@ -191,7 +191,7 @@ def test_delete_boundary_dataset():
     deleted_bds = store.delete_boundary_dataset("id")
     assert deleted_bds == 1
 
-    stored_bds = store.all_boundaries_in_dataset("id")
+    stored_bds = store.query_by_boundary_dataset_id("id")
     assert stored_bds.__len__() == 0
     store.dropAll()
 

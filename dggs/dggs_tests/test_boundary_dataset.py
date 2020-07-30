@@ -1,7 +1,7 @@
-from dggs.boundary import OptimalBoundary
-from dggs.boundary_dataset import BoundaryDataSet
+from dggs.cellset.boundary import OptimalBoundary
+from dggs.dataset.boundary_dataset import BoundaryDataSet
 from dggs.cell_ID import CellID
-from dggs.data import Data
+from dggs.dataset.data import Data
 
 
 def test_boundary_dataset():

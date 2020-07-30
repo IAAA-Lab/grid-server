@@ -1,6 +1,7 @@
-from dggs.boundary import Boundary, OptimalBoundary
+
 from dggs.boundary_ID import BoundaryID, AUID
 from dggs.cell_ID import CellID
+from dggs.cellset.boundary import Boundary, OptimalBoundary
 
 
 def test_boundary_from_boundary_ID():

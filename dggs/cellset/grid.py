@@ -6,7 +6,6 @@ from dggs.rHealPix import rHEALPix
 
 
 class Grid:
-    # TODO
     def __init__(self, refinement_level, boundary_ID=None, cells=None,
                  dggs=rHEALPix(N_side=3, north_square=0, south_square=0)):
         """
@@ -17,9 +16,6 @@ class Grid:
         """
         self.boundary_ID = boundary_ID
         self.cells = cells
-        self.optimal = False
-        self.tree = []
-        self.grid_stack = []
         self.dggs = dggs
         self.refinement_level = refinement_level
 
@@ -39,11 +35,14 @@ class Grid:
                 else:
                     cell_ID = cell_ID + char
             cells.append(CellID(cell_ID))
-            self.cells = cells
+            cell_ids = sorted([cell.value for cell in cells])
+            self.cells = [CellID(id) for id in cell_ids]
 
         if boundary_ID is None:
+            cell_ids = sorted([cell.value for cell in cells])
+            self.cells = [CellID(id) for id in cell_ids]
             boundary_ID = ''
-            for cell_ID in cells:
+            for cell_ID in self.cells:
                 boundary_ID = boundary_ID + cell_ID.value
             self.boundary_ID = BoundaryID(boundary_ID)
 

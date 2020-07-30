@@ -1,11 +1,11 @@
 import json
 import fiona
 
-from dggs.boundary import Boundary, OptimalBoundary
+from dggs.cellset.boundary import Boundary, OptimalBoundary
 from dggs.boundary_ID import BoundaryID
-from dggs.boundary_dataset import BoundaryDataSet
+from dggs.dataset.boundary_dataset import BoundaryDataSet
 from dggs.cell_ID import CellID
-from dggs.data import Data
+from dggs.dataset.data import Data
 from dggs.rHealPix import rHEALPix
 
 
@@ -146,7 +146,7 @@ class ShpDGGSUtils:
             boundary, data = self.get_optimal_boundary_from_shp_file(file, with_ids, refinement=refinement)
             boundary = {
                 'AUID': boundary.boundary_ID.value,
-                'boundary': boundary.AUID_to_ID(),
+                'boundary': boundary.AUID_to_CUIDs(),
                 'data': data.content
             }
         else:

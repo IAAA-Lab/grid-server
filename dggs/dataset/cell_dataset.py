@@ -1,9 +1,8 @@
 import json
 
-from dggs import cell_ID
 from dggs.boundary_ID import BoundaryID
 from dggs.cell_ID import CellID
-from dggs.data import Data
+from dggs.dataset.data import Data
 from dggs.rHealPix import rHEALPix
 
 
@@ -21,12 +20,8 @@ class CellDataSet:
         """
         assert id is not None
         self.id = id
-
         self.boundary_ID = ''
         self.cells = []
-        self.optimal = False
-        self.tree = []
-        self.grid_stack = []
         self.dggs = dggs
 
         if cell_data_set is None:

@@ -1,5 +1,5 @@
 import gdal
-from dggs.cell_dataset import CellDataSet
+from dggs.dataset.cell_dataset import CellDataSet
 from dggs.rHealPix import rHEALPix
 from numpy import pi
 import numpy

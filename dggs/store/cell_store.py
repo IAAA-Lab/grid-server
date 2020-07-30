@@ -3,8 +3,8 @@ from pymongo import MongoClient
 
 import mongodb_config
 from dggs.cell_ID import CellID
-from dggs.cell_dataset import CellDataSet
-from dggs.data import Data
+from dggs.dataset.cell_dataset import CellDataSet
+from dggs.dataset.data import Data
 from dggs.rHealPix import rHEALPix
 
 
@@ -125,7 +125,7 @@ class CellStore:
             cell_data_sets.append(cds)
         return cell_data_sets
 
-    def all_cells_in_dataset(self, id):
+    def query_by_cell_dataset_id(self, id):
         """
         :param id: identifier of the CellDataset
         :return: List of tuples with stored cells and data associated stored in the CellDataset with that id.

@@ -1,10 +1,10 @@
 import pymongo
 from pymongo import MongoClient
 
-from dggs.boundary import OptimalBoundary
+from dggs.cellset.boundary import OptimalBoundary
 from dggs.boundary_ID import AUID
-from dggs.boundary_dataset import BoundaryDataSet
-from dggs.data import Data
+from dggs.dataset.boundary_dataset import BoundaryDataSet
+from dggs.dataset.data import Data
 from dggs.rHealPix import rHEALPix
 import mongodb_config
 from bson import ObjectId
@@ -168,10 +168,10 @@ class BoundaryStore:
             boundary_data_sets.append(bds)
         return boundary_data_sets
 
-    def all_boundaries_in_dataset(self, id):
+    def query_by_boundary_dataset_id(self, id):
         """
         :param id: identifier of the BoundaryDataset
-        :return: List of tuples with stored boundaries and data associated stored in the BoundaryDataset with that id.
+        :return: BoundaryDataset stored with that id.
         """
         boundaries_datasets_founded = self.db.b_data_sets.find({"_id": id})
         boundary_data_sets = []

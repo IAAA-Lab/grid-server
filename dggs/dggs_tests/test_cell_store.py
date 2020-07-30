@@ -1,10 +1,7 @@
-from dggs.boundary import Boundary
-from dggs.boundary_ID import BoundaryID
-from dggs.boundary_dataset import BoundaryDataSet
 from dggs.cell_ID import CellID
-from dggs.cell_dataset import CellDataSet
-from dggs.cell_store import CellStore
-from dggs.data import Data
+from dggs.dataset.cell_dataset import CellDataSet
+from dggs.store.cell_store import CellStore
+from dggs.dataset.data import Data
 
 store = CellStore()
 
@@ -93,7 +90,7 @@ def test_all_cells_in_dataset():
         cds.add(CellID(cell), Data(""))
     store.insert(cds)
 
-    stored_cds = store.all_cells_in_dataset("id")
+    stored_cds = store.query_by_cell_dataset_id("id")
     num_cds = 0
     num_cells = 0
     for cds in stored_cds:
@@ -144,7 +141,7 @@ def test_update_cell_dataset():
         cds2.add(CellID(cell), Data(""))
     store.update_cell_dataset(cds2)
 
-    stored_cds = store.all_cells_in_dataset("id")
+    stored_cds = store.query_by_cell_dataset_id("id")
     num_cds = 0
     num_cells = 0
     for cds in stored_cds:
@@ -194,7 +191,7 @@ def test_delete_cell_dataset():
     deleted_cds = store.delete_cell_dataset("id")
     assert deleted_cds == 1
 
-    stored_cds = store.all_cells_in_dataset("id")
+    stored_cds = store.query_by_cell_dataset_id("id")
     assert stored_cds.__len__() == 0
     store.dropAll()
 

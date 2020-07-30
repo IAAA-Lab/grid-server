@@ -1,10 +1,10 @@
 import json
 from gdal import ogr
 
-from dggs.boundary import Boundary
+from dggs.cellset.boundary import Boundary
 from dggs.boundary_ID import BoundaryID
-from dggs.boundary_dataset import BoundaryDataSet
-from dggs.data import Data
+from dggs.dataset.boundary_dataset import BoundaryDataSet
+from dggs.dataset.data import Data
 from dggs.rHealPix import rHEALPix
 
 
