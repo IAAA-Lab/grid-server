@@ -1,3 +1,4 @@
+import unittest
 from dggs.cellset.boundary import Boundary
 from dggs.dataset.boundary_dataset import BoundaryDataSet
 from dggs.cell_ID import CellID
@@ -6,9 +7,9 @@ from dggs.dggs_utils.dggs_to_shp_utils import DGGSShpUtils
 from dggs.dggs_utils.shp_to_dggs_utils import ShpDGGSUtils
 
 
-class TestsShpDGGS:
+class TestsShpDGGS(unittest.TestCase):
 
-    def __init__(self):
+    def setUp(self):
         self.shp_utils = ShpDGGSUtils()
         self.dggs_utils = DGGSShpUtils()
 
@@ -21,7 +22,7 @@ class TestsShpDGGS:
 
         self.output_file = 'output.shp'
 
-    def remove_files(self):
+    def tearDown(self):
         import os
         from glob import glob
         for file in glob('./*.shp'):
@@ -31,51 +32,24 @@ class TestsShpDGGS:
         for file in glob('./*.shx'):
             os.remove(file)
 
-    def test_shp_file_from_cells(self):
-        self.dggs_utils.shp_file_from_cells(self.cells, self.output_file)
-
-    def test_shp_file_from_boundary(self):
-        self.dggs_utils.shp_file_from_boundary(self.boundary, self.output_file, False)
-
-    def test_shp_files_from_boundary_dataset(self):
-        self.dggs_utils.shp_files_from_boundary_dataset(self.b_dataset,self.output_file, False)
-
-    def test_shp_get_cells_from_shp_file(self, file):
-        cells, data = self.shp_utils.get_cells_from_shp_file(file, True)
-        return cells, data
-
-    def test_get_boundary_from_shp_file(self, file):
-        boundary, data = self.shp_utils.get_boundary_from_shp_file(file, True)
-        return boundary, data
-
-    def test_get_boundary_dataset_from_shp_file(self):
-        bds = self.shp_utils.get_boundary_dataset_from_shp_file('./', 'test_id', True, unic_data=True)
-        return bds
-
     def test_cell_list(self):
-        self.test_shp_file_from_cells()
-        cells, data = self.test_shp_get_cells_from_shp_file(self.output_file)
+        self.dggs_utils.shp_file_from_cells(self.cells, self.output_file)
+        cells, data = self.shp_utils.get_cells_from_shp_file(self.output_file, True)
         boundary = Boundary(cells=cells)
         assert boundary.boundary_ID.value == self.boundary.boundary_ID.value
-        self.remove_files()
 
     def test_boundary(self):
-        self.test_shp_file_from_boundary()
-        boundary, data = self.test_get_boundary_from_shp_file(self.output_file)
+        self.dggs_utils.shp_file_from_boundary(self.boundary, self.output_file, False)
+        boundary, data = self.shp_utils.get_boundary_from_shp_file(self.output_file, True)
         assert boundary.boundary_ID.value == self.boundary.boundary_ID.value
-        self.remove_files()
 
     def test_boundary_dataset(self):
-        self.test_shp_files_from_boundary_dataset()
-        bds = self.test_get_boundary_dataset_from_shp_file()
+        self.dggs_utils.shp_files_from_boundary_dataset(self.b_dataset, self.output_file, False)
+        bds = self.shp_utils.get_boundary_dataset_from_shp_file('./', 'test_id', True, unic_data=True)
         boundary_data = bds.get_boundaries_and_data()
         assert len(boundary_data) == 1
         assert boundary_data[0][0].cells == self.cells
-        self.remove_files()
 
 
-if __name__ == "__main__":
-    tests = TestsShpDGGS()
-    tests.test_cell_list()
-    tests.test_boundary()
-    tests.test_boundary_dataset()
+if __name__ == '__main__':
+    unittest.main()
