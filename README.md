@@ -15,7 +15,7 @@ like shown, so git will ignore it.
 - Install the requirements in your virtual environment: `pip install -r requirements.txt`.
  You may need to install the `libpq-dev` package in your system.
  
- ## Install, start and stop MongoDB
+## Install, start and stop MongoDB
 
 The GitHub repository includes a docker-compose.yml file that references a docker image with MongoDB and a volume 
 for the database data, so the changes in the database are not lost when you start and stop the Docker container.
