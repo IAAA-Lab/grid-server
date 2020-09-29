@@ -15,6 +15,9 @@ like shown, so git will ignore it.
 - Install the requirements in your virtual environment: `pip install -r requirements.txt`.
  You may need to install the `libpq-dev` package in your system.
  
+ Besides this, installing GDAL and the python bindings may be a little tricky. For instance, in Ubuntu 20.04 I have needed to install gdal-bin, libgdal-dev, python3-gdal and libgdal26 (maybe not all of those were required) and then the right version of the GDAL package with pip (its version must be the one provided by the command `ogrinfo --version` in your system). But we need to clarify this and provide clearer instructions here.
+ 
+ 
 ## Install, start and stop MongoDB
 
 The GitHub repository includes a docker-compose.yml file that references a docker image with MongoDB and a volume 
