@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from api_dggs.api.serializer import BoundaryDatasetSerializer, BoundaryDataSerializer,\
     BoundaryDatasetUpdateSerializer, BoundaryDataUpdateSerializer, CellDatasetSerializer, CellDatasetUpdateSerializer, \
     CellDataUpdateSerializer, CellDataSerializer, BoundaryDatasetIDSerializer, CellDatasetIDSerializer
-from dggs.cellset.cellset import Boundary
+from dggs.cellset.boundary import Boundary
 from dggs.boundary_ID import BoundaryID
 from dggs.store.boundary_store import BoundaryStore
 from dggs.cell_ID import CellID

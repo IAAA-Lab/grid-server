@@ -2,7 +2,7 @@ import re
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from dggs.cellset.cellset import Boundary
+from dggs.cellset.boundary import Boundary
 from dggs.boundary_ID import BoundaryID
 from dggs.dataset.boundary_dataset import BoundaryDataSet
 from dggs.cell_ID import CellID
