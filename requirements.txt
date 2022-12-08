@@ -1,5 +1,5 @@
 asgiref==3.2.7
-certifi==2019.11.28
+certifi==2022.12.7
 requests==2.23.0
 djangorestframework==3.11.0
 numpy==1.18.2
